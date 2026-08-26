@@ -114,7 +114,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 
 | # | Phase | Folder | Status |
 |---|-------|--------|--------|
-| 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | [ ] |
+| 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | PARTIAL |
 | 02 | Inter-Service Communication | `phase-02-service-communication/` | [ ] |
 | 03 | Service Discovery | `phase-03-service-discovery/` | [ ] |
 | 04 | Load Balancing | `phase-04-load-balancing/` | [ ] |
@@ -392,7 +392,7 @@ Repository → Parent Maven → Product Service → Database → Product APIs
 ```
 
 - [ ] Create root README, `.gitignore`, docs, infrastructure
-- [ ] Create Phase 1 parent Maven + three services
+- [x] Create Phase 1 parent Maven + three services
 - [ ] Dockerize PostgreSQL
 - [ ] Write, run, break, fix, and understand before moving on
 
@@ -454,7 +454,7 @@ POST /orders
 
 Responsible for: `id`, `name`, `price`, `sku`
 
-- [ ] `GET /api/products`
+- [x] `GET /api/products`
 - [ ] `GET /api/products/{id}`
 - [ ] `POST /api/products`
 - [ ] `PUT /api/products/{id}`

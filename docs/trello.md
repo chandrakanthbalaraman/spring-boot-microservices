@@ -17,7 +17,7 @@ Update Trello only when the human asks (or says “update all status”) — see
 | Phase | List | Card |
 |-------|------|------|
 | 00 Toolkit | Done | https://trello.com/c/goY5ol2b |
-| 01 Architecture | Up Next | https://trello.com/c/Ogs7VdO1 |
+| 01 Architecture | In Progress | https://trello.com/c/Ogs7VdO1 |
 | 02 Communication | Backlog | https://trello.com/c/Zkxt4CVl |
 | 03 Discovery | Backlog | https://trello.com/c/Ev616SIf |
 | 04 Load balancing | Backlog | https://trello.com/c/rpoeKcVA |

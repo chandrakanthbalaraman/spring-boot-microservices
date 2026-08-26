@@ -15,9 +15,10 @@ user-invocable: false
 
 ## Packages
 
-- Base package: `com.example` until the learner sets a permanent root (see TODO below).
+- Base package: `com.example.microservices` until the learner sets a permanent root (see TODO below).
 - Organization: **package-by-layer per service** in early phases — `controller`, `service`,
-  `repository`, `entity`, `dto`, `mapper`, `exception`, `config`.
+  `repository`, `entity`, `dto`, `mapper`, `exception`, `config`,
+  plus `service.impl` for `{Feature}ServiceImpl`.
 - Later: package-by-feature inside a large service is allowed (ADR required).
 - Agents: `{team}-{role}.md` under `.claude/agents/`.
 - Flyway: `V{NNN}__{snake_case_description}.sql` under each service’s `src/main/resources/db/migration/`.
@@ -51,7 +52,7 @@ user-invocable: false
 
 Set the permanent Java base package (5–10 lines in this file under **Packages**):
 
-- Keep `com.example` (roadmap default, fine for learning), or
+- Keep `com.example.microservices` (roadmap default, fine for learning), or
 - Pick a personal root (`com.chandrakanth.sbms`, …) and use it in every service.
 
 This choice is reused for 25 phases — decide before generating Phase 1 Java files.

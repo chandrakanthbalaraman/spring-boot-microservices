@@ -17,12 +17,13 @@ user-invocable: false
 
 - **Phase 1 default** inside each service (`product-service`, `inventory-service`, `order-service`, …):
 
-  `controller`, `service`, `repository`, `entity`, `dto`, `mapper`, `exception`, `config`
+  `controller`, `service` (interfaces), `service.impl` (`{Feature}ServiceImpl`),
+  `repository`, `entity`, `dto`, `mapper`, `exception`, `config`
 
   Base package: see `/.claude/memory/naming-conventions.md` (not `com.orbit`).
 
-- **Dependency direction:** `controller` → `service` → `repository` / `entity`.
-  Controllers do not call repositories directly.
+- **Dependency direction:** `controller` → `service` (interfaces) → `service.impl` → `repository` / `entity`.
+  Controllers do not call repositories or `{Feature}ServiceImpl` directly.
 
 - **Forbidden as the default:** hexagonal / ports-and-adapters (`domain`, `application`,
   `infrastructure`, `port`, `adapter`) as the primary tree.
