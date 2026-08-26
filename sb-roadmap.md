@@ -233,10 +233,10 @@ phase-01  → add communication      → phase-02
 
 One repository + tags for milestones. Work on `main` for learning.
 
-- [ ] Initialize one repo (`spring-boot-microservices`)
+- [x] Initialize one repo (`spring-boot-microservices`)
 - [ ] Commit per phase increment: `phase 01: implement service-to-service communication`
 - [ ] Tag milestones: `phase-01-complete`, `phase-02-complete`, … `capstone`
-- [ ] Do **not** maintain 25 separate repositories
+- [x] Do **not** maintain 25 separate repositories
 
 ```
 main
@@ -261,7 +261,7 @@ phase-01-microservices-basics/
 └── order-service/pom.xml
 ```
 
-- [ ] Enter one service and run: `cd phase-01-microservices-basics/product-service && ./mvnw spring-boot:run`
+- [x] Enter one service and run: `cd phase-01-microservices-basics/product-service && ./mvnw spring-boot:run`
 - [ ] Repeat for inventory-service and order-service
 - [ ] Do **not** force one giant Maven reactor on day one
 
@@ -391,9 +391,9 @@ Repository → Parent Maven → Product Service → Database → Product APIs
          → Phase 1 complete
 ```
 
-- [ ] Create root README, `.gitignore`, docs, infrastructure
+- [x] Create root README, `.gitignore`, docs, infrastructure
 - [x] Create Phase 1 parent Maven + three services
-- [ ] Dockerize PostgreSQL
+- [x] Dockerize PostgreSQL
 - [ ] Write, run, break, fix, and understand before moving on
 
 ---
@@ -455,8 +455,8 @@ POST /orders
 Responsible for: `id`, `name`, `price`, `sku`
 
 - [x] `GET /api/products`
-- [ ] `GET /api/products/{id}`
-- [ ] `POST /api/products`
+- [x] `GET /api/products/{id}`
+- [x] `POST /api/products`
 - [ ] `PUT /api/products/{id}`
 - [ ] `DELETE /api/products/{id}`
 
@@ -476,13 +476,13 @@ Responsible for: `id`, `customerId`, `status`, `totalAmount`
 
 ### Hands-on
 
-- [ ] Independent Spring Boot apps in `spring-microservices/` (or `phase-01-microservices-basics/`)
+- [x] Independent Spring Boot apps in `spring-microservices/` (or `phase-01-microservices-basics/`)
 - [ ] Service layer, repository layer, DTOs, validation, error handling
 - [ ] PostgreSQL + database-per-service
-- [ ] Dockerized PostgreSQL
+- [x] Dockerized PostgreSQL
 - [ ] Run multiple services locally
 - [ ] Basic integration testing
-- [ ] Git repository organization
+- [x] Git repository organization
 
 ### Break it
 
@@ -509,15 +509,15 @@ inventory-service DOWN → order-service → timeout → bad user experience
 ### Phase 1 complete when you can implement
 
 - [ ] Microservice boundaries
-- [ ] 3 independent Spring Boot applications
+- [x] 3 independent Spring Boot applications
 - [ ] REST APIs, DTOs, service layer, repository layer
 - [ ] PostgreSQL and database-per-service
 - [ ] Service-to-service REST calls
 - [ ] Error handling and request validation
 - [ ] Basic integration testing
-- [ ] Dockerized PostgreSQL
+- [x] Dockerized PostgreSQL
 - [ ] Running multiple services locally
-- [ ] Git repository organization
+- [x] Git repository organization
 
 **Next:** Reuse this exact application in Phase 2. Do not start over.
 

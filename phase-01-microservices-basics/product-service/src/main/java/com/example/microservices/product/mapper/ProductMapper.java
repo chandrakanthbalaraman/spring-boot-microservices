@@ -18,14 +18,11 @@ public class ProductMapper {
                 .name(product.getName())
                 .price(product.getPrice())
                 .sku(product.getSku())
+                .status(product.getStatus())
                 .build();
     }
 
     public Product toEntity(ProductCreateRequest request) {
-        return Product.builder()
-                .name(request.getName())
-                .price(request.getPrice())
-                .sku(request.getSku())
-                .build();
+        return Product.create(request.getName(), request.getPrice(), request.getSku());
     }
 }

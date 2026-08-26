@@ -1,0 +1,27 @@
+services:
+
+  product-postgres:
+    image: postgres:17
+    container_name: product-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product_app
+      POSTGRES_PASSWORD: product_app_password
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - product-postgres-data:/var/lib/postgresql/data
+      # - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U product_app -d product_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  product-postgres-data:
