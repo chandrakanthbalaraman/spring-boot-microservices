@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 0 — toolkit + docs: PARTIAL — README / AGENTS / cursor.md / `.cursor`↔`.claude` · GitHub + Trello board created · Phase 1 service code not started · Trello [Phase 00](https://trello.com/c/goY5ol2b) In Progress · [Phase 01](https://trello.com/c/Ogs7VdO1) Up Next**
+**Phase 0 — toolkit: DONE (docs + GitHub + Trello) · Phase 1 service code not started · Trello [Phase 00](https://trello.com/c/goY5ol2b) Done · [Phase 01](https://trello.com/c/Ogs7VdO1) Up Next**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

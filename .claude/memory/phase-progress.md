@@ -17,4 +17,4 @@ Format: `YYYY-MM-DD | Phase | STATUS | note — evidence`
 
 ## Entries
 
-- 2026-08-25 | 0 | PARTIAL | GitHub `spring-boot-microservices` + Trello board `Cjb5ESUA` (26 phase cards); docs/trello.md; Phase 1 Java still MISSING; Trello Phase 00 In Progress, Phase 01 Up Next
+- 2026-08-25 | 0 | DONE | GitHub `spring-boot-microservices` + Trello board `Cjb5ESUA` (26 phase cards); Phase 00 card moved to Done; Phase 1 Java still MISSING
