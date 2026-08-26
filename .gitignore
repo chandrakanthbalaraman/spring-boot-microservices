@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.class
+*.jar
+*.war
+*.iml
+.idea/
+*.ipr
+*.iws
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Secrets and machine-local Spring config
+.env
+**/.env
+**/application-local.yml
+**/application-local.yaml
+
+# Logs
+*.log
+logs/
+
+# Cursor / Claude / local MCP caches
+.cursor/*.log
+.cursor/mcp.json
+.claude/settings.local.json
+.gemini/
+.jolli/

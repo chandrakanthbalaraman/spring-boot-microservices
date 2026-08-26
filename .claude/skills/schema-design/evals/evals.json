@@ -1,0 +1,23 @@
+{
+  "skill_name": "schema-design",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Design the Postgres schema for Orbit Order aggregate including OrderLine. We already have users in V001. Follow package-by-layer and one aggregate per transaction. Output the schema-design template.",
+      "expected_output": "Schema design section with orders + order_lines composition, user_id/product_id as associations only, no shared TX with Payment, next Flyway version note, READY FOR HUMAN sign-off",
+      "files": ["docs/architecture/entity-diagram.md", "src/main/resources/db/migration/V001__create_users.sql"]
+    },
+    {
+      "id": 2,
+      "prompt": "I need tables for Product and Inventory stock. Should Product and StockItem be one aggregate or two? Sketch the schema.",
+      "expected_output": "Recommends separate aggregates (Product vs StockItem) with product_id association; table sketch; warns against one TX spanning both; points to entity-diagram",
+      "files": ["docs/architecture/entity-diagram.md"]
+    },
+    {
+      "id": 3,
+      "prompt": "Add a roles column to users by editing V001__create_users.sql in place.",
+      "expected_output": "Rejects editing applied migration; proposes new V00N additive migration; defers full Auth roles if out of scope; schema rule cited",
+      "files": ["src/main/resources/db/migration/V001__create_users.sql"]
+    }
+  ]
+}
