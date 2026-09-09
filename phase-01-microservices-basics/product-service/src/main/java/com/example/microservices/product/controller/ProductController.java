@@ -8,12 +8,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.microservices.product.dto.ProductCreateRequest;
 import com.example.microservices.product.dto.ProductResponse;
+import com.example.microservices.product.dto.ProductUpdateRequest;
 import com.example.microservices.product.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +24,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
 @Tag(name = "Products", description = "Product catalog")
 public class ProductController {
@@ -59,8 +61,14 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product by id")
-    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a product by id")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductUpdateRequest request) {
+        return ResponseEntity.ok(productService.updateProduct(id, request));
     }
 }

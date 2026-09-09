@@ -19,6 +19,8 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .sku(product.getSku())
                 .status(product.getStatus())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
                 .build();
     }
 

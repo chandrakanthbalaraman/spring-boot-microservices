@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.microservices.product.dto.ProductCreateRequest;
 import com.example.microservices.product.dto.ProductResponse;
+import com.example.microservices.product.dto.ProductUpdateRequest;
 
 public interface ProductService {
 
@@ -15,5 +16,7 @@ public interface ProductService {
 
     ProductResponse getProductBySku(String sku);
 
-    void deleteProduct(int id);
+    ProductResponse updateProduct(Long id, ProductUpdateRequest request);
+
+    void deleteProduct(Long id);
 }
