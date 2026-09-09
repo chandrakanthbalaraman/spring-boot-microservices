@@ -15,5 +15,5 @@ public interface ProductService {
 
     ProductResponse getProductBySku(String sku);
 
-    void deleteProduct(String sku);
+    void deleteProduct(int id);
 }

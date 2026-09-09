@@ -446,8 +446,8 @@ POST /orders
 
 ### Build
 
-- [ ] `product-service`
-- [ ] `inventory-service`
+- [x] `product-service`
+- [x] `inventory-service` (APIs + Flyway + Docker DB; path `/api/v1/inventories`, uncommitted)
 - [ ] `order-service`
 
 ### Product Service
@@ -458,13 +458,13 @@ Responsible for: `id`, `name`, `price`, `sku`
 - [x] `GET /api/products/{id}`
 - [x] `POST /api/products`
 - [ ] `PUT /api/products/{id}`
-- [ ] `DELETE /api/products/{id}`
+- [ ] `DELETE /api/products/{id}` (controller exists; service unimplemented)
 
 ### Inventory Service
 
 Responsible for: `id`, `productId`, `quantity`, `reservedQuantity`
 
-- [ ] `GET /api/inventory/{productId}`
+- [x] `GET /api/inventory/{productId}` (implemented as `GET /api/v1/inventories/{productId}`)
 
 ### Order Service
 

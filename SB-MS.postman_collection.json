@@ -1,0 +1,327 @@
+{
+  "info": {
+    "_postman_id": "6914153e-914a-4704-b7c2-d1afe3f7aede",
+    "name": "SB-MS",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "7709175"
+  },
+  "item": [
+    {
+      "name": "product-service (Phase 01)",
+      "item": [
+        {
+          "name": "Delete product by Id",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{product-service-baseUrl}}/api/products/1",
+              "host": [
+                "{{product-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get product by SKU",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product-service-baseUrl}}/api/products/sku/SKU-1002",
+              "host": [
+                "{{product-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "sku",
+                "SKU-1002"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get product by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product-service-baseUrl}}/api/products/1",
+              "host": [
+                "{{product-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product-service-baseUrl}}/api/products",
+              "host": [
+                "{{product-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Wireless Mouse\",\n  \"price\": 29.99,\n  \"sku\": \"SKU-1002\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{product-service-baseUrl}}/api/products",
+              "host": [
+                "{{product-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "inventory-service (Phase 01)",
+      "item": [
+        {
+          "name": "Create inventory",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 Created', function () {\n  pm.response.to.have.status(201);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{productId}},\n  \"availableQuantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{order-service-baseUrl}}/api/v1/inventories",
+              "host": [
+                "{{order-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventories"
+              ]
+            },
+            "description": "Creates inventory for `{{productId}}` (same variable as product-service). Duplicate productId is rejected."
+          },
+          "response": []
+        },
+        {
+          "name": "Get inventory by productId",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1",
+              "host": [
+                "{{order-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventories",
+                "1"
+              ]
+            },
+            "description": "Lookup by productId, not inventory row id."
+          },
+          "response": []
+        },
+        {
+          "name": "Add stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/add-stock?quantity=10",
+              "host": [
+                "{{order-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventories",
+                "1",
+                "add-stock"
+              ],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Increments availableQuantity. `quantity` must be > 0."
+          },
+          "response": []
+        },
+        {
+          "name": "Reserve stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/reserve-stock?quantity=2",
+              "host": [
+                "{{order-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventories",
+                "1",
+                "reserve-stock"
+              ],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Moves available → reserved. Fails if quantity > availableQuantity."
+          },
+          "response": []
+        },
+        {
+          "name": "Release stock",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/release-stock?quantity=2",
+              "host": [
+                "{{order-service-baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventories",
+                "1",
+                "release-stock"
+              ],
+              "query": [
+                {
+                  "key": "quantity",
+                  "value": "2"
+                }
+              ]
+            },
+            "description": "Moves reserved → available. Fails if quantity > reservedQuantity."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "product-service-baseUrl",
+      "value": ""
+    },
+    {
+      "key": "order-service-baseUrl",
+      "value": ""
+    }
+  ]
+}

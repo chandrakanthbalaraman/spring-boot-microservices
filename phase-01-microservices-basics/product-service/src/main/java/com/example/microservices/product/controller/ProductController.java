@@ -57,10 +57,10 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductBySku(sku));
     }
 
-    @DeleteMapping("/sku/{sku}")
-    @Operation(summary = "Delete a product by SKU")
-    public ResponseEntity<Void> deleteProduct(@PathVariable String sku) {
-        productService.deleteProduct(sku);
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product by id")
+    public ResponseEntity<Void> deleteProduct(@PathVariable int id) {
+        productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
 }

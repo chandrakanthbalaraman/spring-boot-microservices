@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(String sku) {
+    public void deleteProduct(int id) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'deleteProduct'");
     }
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse getProductBySku(String sku) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getProductBySku'");
+        return productMapper.toResponse(productRepository.findBySku(sku)
+                .orElseThrow(() -> new ProductNotFoundException("Product with sku: " + sku + " not found")));
     }
 }
