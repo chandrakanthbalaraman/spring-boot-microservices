@@ -1,121 +1,142 @@
 {
   "info": {
     "_postman_id": "6914153e-914a-4704-b7c2-d1afe3f7aede",
-    "name": "SB-MS",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "7709175"
+    "name": "SB-MS Phase 01",
+    "description": "Phase 1 local APIs: product-service :8081, inventory-service :8082.\n\nRun **Create product** first so `productId` is captured for inventory requests.\norder-service (:8083) has no controller yet — folder is a placeholder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "product-service (Phase 01)",
+      "name": "product-service",
       "item": [
         {
-          "name": "Delete product by Id",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{product-service-baseUrl}}/api/products/1",
-              "host": [
-                "{{product-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "1"
-              ]
+          "name": "List products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Body is a JSON array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Get product by SKU",
+          ],
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{product-service-baseUrl}}/api/products/sku/SKU-1002",
-              "host": [
-                "{{product-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "sku",
-                "SKU-1002"
-              ]
+            "url": "{{productServiceBaseUrl}}/api/v1/products"
+          }
+        },
+        {
+          "name": "Create product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201 Created', () => pm.response.to.have.status(201));",
+                  "const body = pm.response.json();",
+                  "pm.test('Response has id and sku', () => {",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body).to.have.property('sku');",
+                  "});",
+                  "pm.collectionVariables.set('productId', String(body.id));",
+                  "pm.collectionVariables.set('productSku', body.sku);"
+                ]
+              }
             }
-          },
-          "response": []
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mechanical Keyboard\",\n  \"price\": 89.99,\n  \"sku\": \"SKU-{{$timestamp}}\"\n}"
+            },
+            "url": "{{productServiceBaseUrl}}/api/v1/products"
+          }
         },
         {
           "name": "Get product by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Id matches path variable', () => {",
+                  "  pm.expect(String(pm.response.json().id)).to.eql(pm.collectionVariables.get('productId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{product-service-baseUrl}}/api/products/1",
-              "host": [
-                "{{product-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "products",
-                "1"
-              ]
-            }
-          },
-          "response": []
+            "url": "{{productServiceBaseUrl}}/api/v1/products/{{productId}}"
+          }
         },
         {
-          "name": "List products",
+          "name": "Get product by SKU",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('SKU matches', () => {",
+                  "  pm.expect(pm.response.json().sku).to.eql(pm.collectionVariables.get('productSku'));",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{product-service-baseUrl}}/api/products",
-              "host": [
-                "{{product-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ]
-            }
-          },
-          "response": []
+            "url": "{{productServiceBaseUrl}}/api/v1/products/sku/{{productSku}}"
+          }
         },
         {
-          "name": "Create Product",
+          "name": "Update product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Name was updated', () => {",
+                  "  pm.expect(pm.response.json().name).to.include('updated');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
-            "method": "POST",
-            "header": [],
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Wireless Mouse\",\n  \"price\": 29.99,\n  \"sku\": \"SKU-1002\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"name\": \"Mechanical Keyboard (updated)\",\n  \"price\": 79.99\n}"
             },
-            "url": {
-              "raw": "{{product-service-baseUrl}}/api/products",
-              "host": [
-                "{{product-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "products"
-              ]
-            }
-          },
-          "response": []
+            "url": "{{productServiceBaseUrl}}/api/v1/products/{{productId}}"
+          }
         }
       ]
     },
     {
-      "name": "inventory-service (Phase 01)",
+      "name": "inventory-service",
       "item": [
         {
           "name": "Create inventory",
@@ -125,7 +146,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 201 Created', function () {\n  pm.response.to.have.status(201);\n});"
+                  "pm.test('Status is 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('productId matches', () => {",
+                  "  pm.expect(String(pm.response.json().productId)).to.eql(pm.collectionVariables.get('productId'));",
+                  "});"
                 ]
               }
             }
@@ -133,34 +157,15 @@
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"productId\": {{productId}},\n  \"availableQuantity\": 100\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
+              "raw": "{\n  \"productId\": {{productId}},\n  \"availableQuantity\": 100\n}"
             },
-            "url": {
-              "raw": "{{order-service-baseUrl}}/api/v1/inventories",
-              "host": [
-                "{{order-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "inventories"
-              ]
-            },
-            "description": "Creates inventory for `{{productId}}` (same variable as product-service). Duplicate productId is rejected."
-          },
-          "response": []
+            "url": "{{inventoryServiceBaseUrl}}/api/v1/inventories",
+            "description": "Creates stock for `{{productId}}`. Duplicate productId is rejected."
+          }
         },
         {
           "name": "Get inventory by productId",
@@ -170,7 +175,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -178,21 +183,9 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1",
-              "host": [
-                "{{order-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "inventories",
-                "1"
-              ]
-            },
+            "url": "{{inventoryServiceBaseUrl}}/api/v1/inventories/{{productId}}",
             "description": "Lookup by productId, not inventory row id."
-          },
-          "response": []
+          }
         },
         {
           "name": "Add stock",
@@ -202,7 +195,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -211,27 +204,13 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/add-stock?quantity=10",
-              "host": [
-                "{{order-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "inventories",
-                "1",
-                "add-stock"
-              ],
-              "query": [
-                {
-                  "key": "quantity",
-                  "value": "10"
-                }
-              ]
+              "raw": "{{inventoryServiceBaseUrl}}/api/v1/inventories/{{productId}}/add-stock?quantity=10",
+              "host": ["{{inventoryServiceBaseUrl}}"],
+              "path": ["api", "v1", "inventories", "{{productId}}", "add-stock"],
+              "query": [{ "key": "quantity", "value": "10" }]
             },
-            "description": "Increments availableQuantity. `quantity` must be > 0."
-          },
-          "response": []
+            "description": "Increments availableQuantity. quantity must be > 0."
+          }
         },
         {
           "name": "Reserve stock",
@@ -241,7 +220,10 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('reservedQuantity increased', () => {",
+                  "  pm.expect(pm.response.json().reservedQuantity).to.be.at.least(1);",
+                  "});"
                 ]
               }
             }
@@ -250,27 +232,13 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/reserve-stock?quantity=2",
-              "host": [
-                "{{order-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "inventories",
-                "1",
-                "reserve-stock"
-              ],
-              "query": [
-                {
-                  "key": "quantity",
-                  "value": "2"
-                }
-              ]
+              "raw": "{{inventoryServiceBaseUrl}}/api/v1/inventories/{{productId}}/reserve-stock?quantity=2",
+              "host": ["{{inventoryServiceBaseUrl}}"],
+              "path": ["api", "v1", "inventories", "{{productId}}", "reserve-stock"],
+              "query": [{ "key": "quantity", "value": "2" }]
             },
             "description": "Moves available → reserved. Fails if quantity > availableQuantity."
-          },
-          "response": []
+          }
         },
         {
           "name": "Release stock",
@@ -280,7 +248,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('Status is 200 OK', function () {\n  pm.response.to.have.status(200);\n});"
+                  "pm.test('Status is 200 OK', () => pm.response.to.have.status(200));"
                 ]
               }
             }
@@ -289,39 +257,82 @@
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{order-service-baseUrl}}/api/v1/inventories/1/release-stock?quantity=2",
-              "host": [
-                "{{order-service-baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "inventories",
-                "1",
-                "release-stock"
-              ],
-              "query": [
-                {
-                  "key": "quantity",
-                  "value": "2"
-                }
-              ]
+              "raw": "{{inventoryServiceBaseUrl}}/api/v1/inventories/{{productId}}/release-stock?quantity=2",
+              "host": ["{{inventoryServiceBaseUrl}}"],
+              "path": ["api", "v1", "inventories", "{{productId}}", "release-stock"],
+              "query": [{ "key": "quantity", "value": "2" }]
             },
             "description": "Moves reserved → available. Fails if quantity > reservedQuantity."
-          },
-          "response": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "order-service",
+      "item": [
+        {
+          "name": "POST /orders (not implemented)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    { \"productId\": {{productId}}, \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": "{{orderServiceBaseUrl}}/api/v1/orders",
+            "description": "Placeholder. order-service has DTOs + DB, but no controller yet. Expect 404 until POST /orders is implemented."
+          }
+        }
+      ]
+    },
+    {
+      "name": "cleanup",
+      "item": [
+        {
+          "name": "Delete product by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204 No Content', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{productServiceBaseUrl}}/api/v1/products/{{productId}}",
+            "description": "Runs last so inventory tests still have a productId."
+          }
         }
       ]
     }
   ],
   "variable": [
     {
-      "key": "product-service-baseUrl",
-      "value": ""
+      "key": "productServiceBaseUrl",
+      "value": "http://localhost:8081"
     },
     {
-      "key": "order-service-baseUrl",
-      "value": ""
+      "key": "inventoryServiceBaseUrl",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "orderServiceBaseUrl",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "productId",
+      "value": "3"
+    },
+    {
+      "key": "productSku",
+      "value": "SKU-PM-1788992826"
     }
   ]
 }

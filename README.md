@@ -80,16 +80,43 @@ Every phase README should cover: Objective, Architecture, How to Run, APIs, Fail
 
 ## Local infrastructure
 
-Keep databases off the host Mac. When `infrastructure/docker/` exists:
+Keep databases off the host Mac. Phase 1 uses **database-per-service**: three Postgres containers plus one **pgAdmin** UI that talks to all three.
 
 ```bash
-cd infrastructure/docker
+cd infrastructure/docker/postgres
 docker compose up -d
 ```
 
-Start with PostgreSQL. Later: Redis, Kafka, Prometheus, Grafana, Tempo/Jaeger.
+| Service | Database | User | Password (local only) | Host from pgAdmin | Host from Mac |
+|---------|----------|------|------------------------|-------------------|---------------|
+| `product-postgres` | `product_db` | `product_app` | `product_app_password` | `product-postgres` | `localhost:5433` |
+| `inventory-postgres` | `inventory_db` | `inventory_app` | `inventory_app_password` | `inventory-postgres` | `localhost:5434` |
+| `order-postgres` | `order_db` | `order_app` | `order_app_password` | `order-postgres` | `localhost:5435` |
 
-Never commit secrets. Use `.env.example` plus `application-local.yml` (gitignored).
+Spring Boot services on the Mac use the **localhost** ports. Inside Docker (including pgAdmin), use the **service names** — they resolve on the Compose network. Do **not** use `localhost` inside pgAdmin; that would mean the pgAdmin container itself.
+
+### Open pgAdmin (all three databases in one client)
+
+1. Start Compose (command above). Wait until `pgadmin` is running.
+2. Open [http://localhost:5050](http://localhost:5050).
+3. Log in with:
+   - **Email:** `admin@example.com`
+   - **Password:** `admin`
+4. In the left tree, expand **Servers → SB-MS**. The three servers (`product`, `inventory`, `order`) are pre-registered from `infrastructure/docker/postgres/pgadmin/servers.json`.
+5. Click a server and enter that database’s password from the table (for example `product_app_password`). Save the password if you want.
+
+Each tree node is a **different Postgres instance**, not a database on the same server. Switch databases by clicking another server in the tree — do not expect `\c` / “change database” to jump from product to inventory.
+
+If the left tree is empty after a first run, the `servers.json` mount only applies on a fresh pgAdmin volume. Recreate it with:
+
+```bash
+cd infrastructure/docker/postgres
+docker compose up -d --force-recreate pgadmin
+```
+
+Passwords above are local Compose defaults — never commit real secrets. Use `.env.example` plus `application-local.yml` (gitignored) when you leave these defaults.
+
+Later: Redis, Kafka, Prometheus, Grafana, Tempo/Jaeger.
 
 ---
 

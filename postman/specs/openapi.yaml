@@ -1,0 +1,591 @@
+openapi: 3.0.3
+info:
+  title: SB-MS Phase 01 APIs
+  version: 1.0.0
+  description: |
+    Combined contract for Phase 1 of the SB-MS commerce platform.
+
+    Three independently runnable Spring Boot services, database-per-service:
+
+    - **product-service** (`:8081`) — catalog CRUD. Implemented.
+    - **inventory-service** (`:8082`) — stock create / lookup / add / reserve / release. Implemented.
+    - **order-service** (`:8083`) — `POST /api/v1/orders` is **not implemented yet** (DTOs + Flyway only). Omitted from this spec on purpose.
+
+    Errors use RFC 9457 Problem Details (`application/problem+json`). Phase 1 has no authentication.
+  contact:
+    name: SB-MS
+    url: https://github.com/chandrakanthbalaraman/spring-boot-microservices
+
+servers:
+  - url: http://localhost:8081
+    description: product-service (local)
+  - url: http://localhost:8082
+    description: inventory-service (local)
+
+tags:
+  - name: Products
+    description: Product catalog (product-service)
+  - name: Inventory
+    description: Stock levels keyed by productId (inventory-service)
+
+paths:
+  /api/v1/products:
+    servers:
+      - url: http://localhost:8081
+    get:
+      operationId: listProducts
+      tags: [Products]
+      summary: List all products
+      description: Returns the full catalog. Phase 1 does not paginate.
+      responses:
+        "200":
+          description: Catalog snapshot
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductResponse"
+              example:
+                - id: 1
+                  name: Mechanical Keyboard
+                  price: 89.99
+                  sku: SKU-1710000000
+                  status: ACTIVE
+                  createdAt: "2026-09-09T18:00:00Z"
+                  updatedAt: "2026-09-09T18:00:00Z"
+                  version: 0
+        "500":
+          $ref: "#/components/responses/InternalError"
+    post:
+      operationId: createProduct
+      tags: [Products]
+      summary: Create a product
+      description: SKU must be unique. Duplicate SKU returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreateRequest"
+            example:
+              name: Mechanical Keyboard
+              price: 89.99
+              sku: SKU-1710000000
+      responses:
+        "201":
+          description: Product created
+          headers:
+            Location:
+              description: URI of the new product. Controller currently writes `/api/products/{id}` (missing `v1`); clients should prefer the response body `id`.
+              schema:
+                type: string
+                format: uri
+              example: /api/v1/products/1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          description: SKU already exists, or a constraint / optimistic-lock conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: product-already-exists
+                title: Product already exists
+                status: 409
+                detail: Product with sku SKU-1710000000 already exists
+                instance: /api/v1/products
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/products/{id}:
+    servers:
+      - url: http://localhost:8081
+    parameters:
+      - $ref: "#/components/parameters/ProductId"
+    get:
+      operationId: getProductById
+      tags: [Products]
+      summary: Get a product by id
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          $ref: "#/components/responses/ProductNotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    put:
+      operationId: updateProduct
+      tags: [Products]
+      summary: Update a product by id
+      description: Full replacement of name and price. SKU is immutable.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdateRequest"
+            example:
+              name: Mechanical Keyboard (updated)
+              price: 79.99
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/ProductNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    delete:
+      operationId: deleteProduct
+      tags: [Products]
+      summary: Delete a product by id
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          $ref: "#/components/responses/ProductNotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/products/sku/{sku}:
+    servers:
+      - url: http://localhost:8081
+    get:
+      operationId: getProductBySku
+      tags: [Products]
+      summary: Get a product by SKU
+      parameters:
+        - name: sku
+          in: path
+          required: true
+          description: Unique stock-keeping unit
+          schema:
+            type: string
+          example: SKU-1710000000
+      responses:
+        "200":
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "404":
+          $ref: "#/components/responses/ProductNotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/inventories:
+    servers:
+      - url: http://localhost:8082
+    post:
+      operationId: createInventory
+      tags: [Inventory]
+      summary: Create inventory for a product
+      description: One inventory row per `productId`. Duplicate `productId` returns 409.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryCreateRequest"
+            example:
+              productId: 1
+              availableQuantity: 100
+      responses:
+        "201":
+          description: Inventory created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "409":
+          description: Inventory already exists for this productId
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              example:
+                type: inventory-already-exists
+                title: Inventory already exists
+                status: 409
+                detail: Inventory already exists for product 1
+                instance: /api/v1/inventories
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/inventories/{productId}:
+    servers:
+      - url: http://localhost:8082
+    get:
+      operationId: getInventoryByProductId
+      tags: [Inventory]
+      summary: Get inventory by productId
+      description: Lookup is by catalog `productId`, not the inventory row id.
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+      responses:
+        "200":
+          description: Inventory found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryResponse"
+        "404":
+          $ref: "#/components/responses/InventoryNotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/inventories/{productId}/add-stock:
+    servers:
+      - url: http://localhost:8082
+    post:
+      operationId: addStock
+      tags: [Inventory]
+      summary: Add available stock
+      description: Increments `availableQuantity`. Phase 1 uses an action path rather than `PATCH`.
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+        - $ref: "#/components/parameters/QuantityQuery"
+      responses:
+        "200":
+          description: Stock added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/InventoryNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/inventories/{productId}/reserve-stock:
+    servers:
+      - url: http://localhost:8082
+    post:
+      operationId: reserveStock
+      tags: [Inventory]
+      summary: Reserve stock for an order
+      description: Moves units from `availableQuantity` to `reservedQuantity`. Fails when quantity exceeds available.
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+        - $ref: "#/components/parameters/QuantityQuery"
+      responses:
+        "200":
+          description: Stock reserved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryResponse"
+        "400":
+          description: Validation failed or insufficient available stock
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+              examples:
+                insufficient:
+                  value:
+                    type: insufficient-inventory
+                    title: Insufficient inventory
+                    status: 400
+                    detail: Not enough available stock to reserve 50 units
+                    instance: /api/v1/inventories/1/reserve-stock
+        "404":
+          $ref: "#/components/responses/InventoryNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /api/v1/inventories/{productId}/release-stock:
+    servers:
+      - url: http://localhost:8082
+    post:
+      operationId: releaseStock
+      tags: [Inventory]
+      summary: Release previously reserved stock
+      description: Moves units from `reservedQuantity` back to `availableQuantity`.
+      parameters:
+        - $ref: "#/components/parameters/ProductIdPath"
+        - $ref: "#/components/parameters/QuantityQuery"
+      responses:
+        "200":
+          description: Stock released
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "404":
+          $ref: "#/components/responses/InventoryNotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+components:
+  parameters:
+    ProductId:
+      name: id
+      in: path
+      required: true
+      description: Product primary key
+      schema:
+        type: integer
+        format: int64
+      example: 1
+    ProductIdPath:
+      name: productId
+      in: path
+      required: true
+      description: Catalog product id that owns this inventory row
+      schema:
+        type: integer
+        format: int64
+      example: 1
+    QuantityQuery:
+      name: quantity
+      in: query
+      required: true
+      description: Units to add, reserve, or release. Must be a positive integer.
+      schema:
+        type: integer
+        minimum: 1
+      example: 10
+
+  responses:
+    ValidationError:
+      description: Request body or query failed Jakarta Validation
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: validation-failed
+            title: Validation Failed
+            status: 400
+            detail: One or more request fields are invalid.
+            instance: /api/v1/products
+            errors:
+              sku: must not be blank
+              price: must be greater than 0
+    ProductNotFound:
+      description: No product for this id or SKU
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: product-not-found
+            title: Product not found
+            status: 404
+            detail: Product not found with id 99
+            instance: /api/v1/products/99
+    InventoryNotFound:
+      description: No inventory row for this productId
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: inventory-not-found
+            title: Inventory not found
+            status: 404
+            detail: Inventory not found for product 99
+            instance: /api/v1/inventories/99
+    Conflict:
+      description: Optimistic lock or data-integrity conflict — retry
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+          example:
+            type: concurrent-modification
+            title: Concurrent Modification
+            status: 409
+            detail: Inventory was modified by another transaction. Please retry.
+            instance: /api/v1/inventories/1/reserve-stock
+    InternalError:
+      description: Unhandled server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetail"
+
+  schemas:
+    ProductStatus:
+      type: string
+      enum: [ACTIVE, INACTIVE]
+      example: ACTIVE
+
+    ProductCreateRequest:
+      type: object
+      required: [name, price, sku]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Display name
+          example: Mechanical Keyboard
+        price:
+          type: number
+          format: double
+          exclusiveMinimum: true
+          minimum: 0
+          description: Unit price; must be positive
+          example: 89.99
+        sku:
+          type: string
+          minLength: 1
+          description: Unique stock-keeping unit
+          example: SKU-1710000000
+
+    ProductUpdateRequest:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: Mechanical Keyboard (updated)
+        price:
+          type: number
+          format: double
+          exclusiveMinimum: true
+          minimum: 0
+          example: 79.99
+
+    ProductResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Mechanical Keyboard
+        price:
+          type: number
+          format: double
+          example: 89.99
+        sku:
+          type: string
+          example: SKU-1710000000
+        status:
+          $ref: "#/components/schemas/ProductStatus"
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-09T18:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-09-09T18:01:00Z"
+        version:
+          type: integer
+          format: int64
+          description: Optimistic-lock version
+          example: 0
+
+    InventoryCreateRequest:
+      type: object
+      required: [productId]
+      properties:
+        productId:
+          type: integer
+          format: int64
+          exclusiveMinimum: true
+          minimum: 0
+          description: Catalog product this stock belongs to
+          example: 1
+        availableQuantity:
+          type: integer
+          minimum: 0
+          description: Starting on-hand quantity (defaults to 0 if omitted)
+          example: 100
+
+    InventoryResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        productId:
+          type: integer
+          format: int64
+          example: 1
+        availableQuantity:
+          type: integer
+          example: 90
+        reservedQuantity:
+          type: integer
+          example: 10
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-09-09T18:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2026-09-09T18:05:00Z"
+        version:
+          type: integer
+          format: int64
+          description: Optimistic-lock version
+          example: 3
+
+    ProblemDetail:
+      type: object
+      description: RFC 9457 Problem Details as returned by `@RestControllerAdvice`
+      required: [title, status]
+      properties:
+        type:
+          type: string
+          description: Stable problem type (relative URI in Phase 1)
+          example: product-not-found
+        title:
+          type: string
+          example: Product not found
+        status:
+          type: integer
+          example: 404
+        detail:
+          type: string
+          example: Product not found with id 99
+        instance:
+          type: string
+          description: Request URI that produced the problem
+          example: /api/v1/products/99
+        errors:
+          type: object
+          additionalProperties:
+            type: string
+          description: Field → message map on validation failures
+          example:
+            sku: must not be blank

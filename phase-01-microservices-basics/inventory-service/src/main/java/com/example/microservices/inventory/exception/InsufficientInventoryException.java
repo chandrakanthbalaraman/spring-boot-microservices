@@ -7,4 +7,8 @@ public class InsufficientInventoryException extends RuntimeException {
                     .formatted(productId, requestedQuantity, availableQuantity)
             );
     }
+
+    public InsufficientInventoryException(String message) {
+        super(message);
+    }
 }

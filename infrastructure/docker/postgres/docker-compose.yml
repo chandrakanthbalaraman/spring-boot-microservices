@@ -45,6 +45,52 @@ services:
       timeout: 5s
       retries: 10
 
+  order-postgres:
+    image: postgres:17
+    container_name: order-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order_app
+      POSTGRES_PASSWORD: order_app_password
+
+    ports:
+      - "5435:5432"
+
+    volumes:
+      - order-postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U order_app -d order_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Browser UI for all three Postgres instances (http://localhost:5050).
+  # Pre-registered servers: ./pgadmin/servers.json
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    depends_on:
+      product-postgres:
+        condition: service_healthy
+      inventory-postgres:
+        condition: service_healthy
+      order-postgres:
+        condition: service_healthy
+
 volumes:
   product-postgres-data:
   inventory-postgres-data:
+  order-postgres-data:
+  pgadmin-data:

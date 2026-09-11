@@ -447,8 +447,8 @@ POST /orders
 ### Build
 
 - [x] `product-service`
-- [x] `inventory-service` (APIs + Flyway + Docker DB; path `/api/v1/inventories`, uncommitted)
-- [ ] `order-service`
+- [x] `inventory-service` (APIs + Flyway + Docker DB + advice; path `/api/v1/inventories`)
+- [ ] `order-service` (Flyway + `order_db` + entities; POST /orders and REST clients still open)
 
 ### Product Service
 
@@ -457,8 +457,8 @@ Responsible for: `id`, `name`, `price`, `sku`
 - [x] `GET /api/products`
 - [x] `GET /api/products/{id}`
 - [x] `POST /api/products`
-- [ ] `PUT /api/products/{id}`
-- [ ] `DELETE /api/products/{id}` (controller exists; service unimplemented)
+- [x] `PUT /api/products/{id}` (implemented as `PUT /api/v1/products/{id}`)
+- [x] `DELETE /api/products/{id}` (implemented as `DELETE /api/v1/products/{id}`)
 
 ### Inventory Service
 
@@ -477,8 +477,8 @@ Responsible for: `id`, `customerId`, `status`, `totalAmount`
 ### Hands-on
 
 - [x] Independent Spring Boot apps in `spring-microservices/` (or `phase-01-microservices-basics/`)
-- [ ] Service layer, repository layer, DTOs, validation, error handling
-- [ ] PostgreSQL + database-per-service
+- [ ] Service layer, repository layer, DTOs, validation, error handling (order-service still missing service/controller)
+- [x] PostgreSQL + database-per-service (`product_db` :5433, `inventory_db` :5434, `order_db` :5435)
 - [x] Dockerized PostgreSQL
 - [ ] Run multiple services locally
 - [ ] Basic integration testing
@@ -511,9 +511,9 @@ inventory-service DOWN → order-service → timeout → bad user experience
 - [ ] Microservice boundaries
 - [x] 3 independent Spring Boot applications
 - [ ] REST APIs, DTOs, service layer, repository layer
-- [ ] PostgreSQL and database-per-service
+- [x] PostgreSQL and database-per-service
 - [ ] Service-to-service REST calls
-- [ ] Error handling and request validation
+- [ ] Error handling and request validation (product + inventory advice done; order still open)
 - [ ] Basic integration testing
 - [x] Dockerized PostgreSQL
 - [ ] Running multiple services locally
