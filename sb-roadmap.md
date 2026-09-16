@@ -114,7 +114,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 
 | # | Phase | Folder | Status |
 |---|-------|--------|--------|
-| 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | PARTIAL |
+| 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | DONE (tests N/A) |
 | 02 | Inter-Service Communication | `phase-02-service-communication/` | [ ] |
 | 03 | Service Discovery | `phase-03-service-discovery/` | [ ] |
 | 04 | Load Balancing | `phase-04-load-balancing/` | [ ] |
@@ -262,28 +262,28 @@ phase-01-microservices-basics/
 ```
 
 - [x] Enter one service and run: `cd phase-01-microservices-basics/product-service && ./mvnw spring-boot:run`
-- [ ] Repeat for inventory-service and order-service
-- [ ] Do **not** force one giant Maven reactor on day one
+- [x] Repeat for inventory-service and order-service
+- [x] Do **not** force one giant Maven reactor on day one
 
 ### Phase README Template
 
 Every phase folder gets a `README.md` with:
 
-- [ ] Objective
-- [ ] Architecture
-- [ ] Services
-- [ ] Prerequisites
-- [ ] Project Structure
-- [ ] How to Run
-- [ ] API Endpoints
-- [ ] Request Flow
-- [ ] Database
-- [ ] Testing
-- [ ] Failure Scenarios
-- [ ] What We Learned
-- [ ] Exercises
-- [ ] Production Improvements
-- [ ] Next Phase
+- [x] Objective
+- [x] Architecture
+- [x] Services
+- [x] Prerequisites
+- [x] Project Structure
+- [x] How to Run
+- [x] API Endpoints
+- [x] Request Flow
+- [x] Database
+- [x] Testing (section present; JUnit **N/A (intentional)**)
+- [x] Failure Scenarios
+- [x] What We Learned
+- [x] Exercises
+- [x] Production Improvements
+- [x] Next Phase
 
 ### Package Structure (every service)
 
@@ -394,7 +394,7 @@ Repository → Parent Maven → Product Service → Database → Product APIs
 - [x] Create root README, `.gitignore`, docs, infrastructure
 - [x] Create Phase 1 parent Maven + three services
 - [x] Dockerize PostgreSQL
-- [ ] Write, run, break, fix, and understand before moving on
+- [x] Write, run, break, fix, and understand before moving on
 
 ---
 
@@ -430,25 +430,25 @@ POST /orders
 
 ### Learn
 
-- [ ] Monolith vs modular monolith vs microservices
-- [ ] Service boundaries
-- [ ] Bounded contexts
-- [ ] Database-per-service
-- [ ] Service-to-service communication
-- [ ] REST communication
-- [ ] DTOs
-- [ ] API contracts
-- [ ] Synchronous vs asynchronous communication
-- [ ] Inter-service dependencies
-- [ ] Failure propagation
-- [ ] Distributed transactions (problem awareness)
-- [ ] Eventual consistency (problem awareness)
+- [x] Monolith vs modular monolith vs microservices
+- [x] Service boundaries
+- [x] Bounded contexts
+- [x] Database-per-service
+- [x] Service-to-service communication
+- [x] REST communication
+- [x] DTOs
+- [x] API contracts
+- [x] Synchronous vs asynchronous communication (sync REST in Phase 1; Kafka is Phase 10)
+- [x] Inter-service dependencies
+- [x] Failure propagation (compensation + RestClientException)
+- [x] Distributed transactions (problem awareness — manual release on failure)
+- [x] Eventual consistency (problem awareness)
 
 ### Build
 
 - [x] `product-service`
 - [x] `inventory-service` (APIs + Flyway + Docker DB + advice; path `/api/v1/inventories`)
-- [ ] `order-service` (Flyway + `order_db` + entities; POST /orders and REST clients still open)
+- [x] `order-service` (Flyway + `order_db` + entities; POST `/api/v1/orders` + GET `/{id}` + RestClient)
 
 ### Product Service
 
@@ -470,18 +470,18 @@ Responsible for: `id`, `productId`, `quantity`, `reservedQuantity`
 
 Responsible for: `id`, `customerId`, `status`, `totalAmount`
 
-- [ ] `POST /api/orders`
-- [ ] Validate product via Product Service (sync REST)
-- [ ] Check availability via Inventory Service (sync REST)
+- [x] `POST /api/orders` (implemented as `POST /api/v1/orders`)
+- [x] Validate product via Product Service (sync REST)
+- [x] Check availability via Inventory Service (sync REST reserve)
 
 ### Hands-on
 
 - [x] Independent Spring Boot apps in `spring-microservices/` (or `phase-01-microservices-basics/`)
-- [ ] Service layer, repository layer, DTOs, validation, error handling (order-service still missing service/controller)
+- [x] Service layer, repository layer, DTOs, validation, error handling
 - [x] PostgreSQL + database-per-service (`product_db` :5433, `inventory_db` :5434, `order_db` :5435)
 - [x] Dockerized PostgreSQL
-- [ ] Run multiple services locally
-- [ ] Basic integration testing
+- [x] Run multiple services locally
+- [ ] Basic integration testing — **N/A (intentional):** skipped; manual Postman + break-it in phase README
 - [x] Git repository organization
 
 ### Break it
@@ -490,9 +490,9 @@ Responsible for: `id`, `customerId`, `status`, `totalAmount`
 inventory-service DOWN → order-service → timeout → bad user experience
 ```
 
-- [ ] Stop `inventory-service`
-- [ ] Observe what happens to `order-service`
-- [ ] Use this failure as motivation for later phases
+- [x] Stop `inventory-service` (also product-service DOWN — same RestClientException path)
+- [x] Observe what happens to `order-service`
+- [x] Use this failure as motivation for later phases
 
 ### Communication evolution path
 
@@ -508,15 +508,15 @@ inventory-service DOWN → order-service → timeout → bad user experience
 
 ### Phase 1 complete when you can implement
 
-- [ ] Microservice boundaries
+- [x] Microservice boundaries
 - [x] 3 independent Spring Boot applications
-- [ ] REST APIs, DTOs, service layer, repository layer
+- [x] REST APIs, DTOs, service layer, repository layer
 - [x] PostgreSQL and database-per-service
-- [ ] Service-to-service REST calls
-- [ ] Error handling and request validation (product + inventory advice done; order still open)
-- [ ] Basic integration testing
+- [x] Service-to-service REST calls
+- [x] Error handling and request validation
+- [ ] Basic integration testing — **N/A (intentional):** skipped
 - [x] Dockerized PostgreSQL
-- [ ] Running multiple services locally
+- [x] Running multiple services locally
 - [x] Git repository organization
 
 **Next:** Reuse this exact application in Phase 2. Do not start over.

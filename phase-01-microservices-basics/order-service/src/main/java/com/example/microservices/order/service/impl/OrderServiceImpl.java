@@ -3,11 +3,13 @@ package com.example.microservices.order.service.impl;
 import com.example.microservices.order.service.OrderService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.example.microservices.order.repository.OrderRepository;
 import com.example.microservices.order.entity.Order;
 import com.example.microservices.order.dto.OrderResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,21 +24,24 @@ import com.example.microservices.order.mapper.OrderMapper;
 import com.example.microservices.order.exception.OrderNotFoundException;
 
 
+@Slf4j(topic = "OrderServiceImpl")
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
     private final InventoryClient inventoryClient;
+    
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
+        log.info("Creating order for customer: {}", request.getCustomerId());
         // Create Order
         Order order = Order.create(request.getCustomerId()); 
-        
+        log.info("Order created: {}", order.getId());
         //Compensate Failure
-        List<OrderItemRequest> processedItems = request.getItems();
-
+        List<OrderItemRequest> processedItems = new ArrayList<>();
+        
         try {
             // Add Items to Order
             for (OrderItemRequest itemRequest : request.getItems()) {
@@ -52,15 +57,19 @@ public class OrderServiceImpl implements OrderService {
                     itemRequest.getQuantity(),
                     product.getPrice()
                 );
-
-                // Confirm Order
-                order.confirm();
-
-                // Save Order
-                Order savedOrder = orderRepository.save(order);
-                return OrderMapper.toResponse(savedOrder);
+                log.info("Item added to order: {}", itemRequest.getProductId());
+                
             }
+            // Confirm Order
+            order.confirm();
+
+            log.info("Order confirmed: {}", order.getId());
+            // Save Order
+            Order savedOrder = orderRepository.save(order);
+            log.info("Order saved: {}", savedOrder.getId());
+            return OrderMapper.toResponse(savedOrder);
         } catch (Exception createException) {
+            log.error("Compensating failure for order: {}", order.getId(), createException);
             // Compensate Failure
             for (OrderItemRequest itemRequest : processedItems) {
                 try {
@@ -76,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse getOrder(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findWithItemsById(orderId)
             .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
         return OrderMapper.toResponse(order);
     }

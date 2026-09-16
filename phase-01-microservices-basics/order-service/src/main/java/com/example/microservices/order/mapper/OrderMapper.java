@@ -8,13 +8,8 @@ import com.example.microservices.order.dto.OrderCreateRequest;
 import com.example.microservices.order.dto.OrderResponse;
 import com.example.microservices.order.entity.Order;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
-@RequiredArgsConstructor
 public class OrderMapper {
-
-    private final OrderItemMapper orderItemMapper;
 
     public static OrderResponse toResponse(Order order) {
         return OrderResponse.builder()
