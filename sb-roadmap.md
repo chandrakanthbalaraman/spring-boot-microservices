@@ -115,7 +115,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | # | Phase | Folder | Status |
 |---|-------|--------|--------|
 | 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | DONE (tests N/A) |
-| 02 | Inter-Service Communication | `phase-02-service-communication/` | [ ] |
+| 02 | Inter-Service Communication | `phase-02-service-communication/` | PARTIAL |
 | 03 | Service Discovery | `phase-03-service-discovery/` | [ ] |
 | 04 | Load Balancing | `phase-04-load-balancing/` | [ ] |
 | 05 | API Gateway | `phase-05-api-gateway/` | [ ] |

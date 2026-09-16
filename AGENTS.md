@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 1 DONE (working tree; JUnit N/A intentional) · next: Phase 2 Inter-Service Communication (timeouts / Feign) not started · Trello [Phase 00](https://trello.com/c/goY5ol2b) Done · [Phase 01](https://trello.com/c/Ogs7VdO1) still In Progress until you move the card**
+**Phase 2 — folder scaffolded (`phase-02-service-communication/`) · first slice: RestClient timeouts (not wired yet) · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) · [Phase 02](https://trello.com/c/Zkxt4CVl)**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

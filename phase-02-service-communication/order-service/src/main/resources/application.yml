@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: order-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/order_db
+    username: order_app
+    password: order_app_password
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mvc:
+    problemdetails:
+      enabled: true
+server:
+  port: 8083
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+
+clients:
+  product-service:
+    base-url: http://localhost:8081
+    connect-timeout: 500ms
+    read-timeout: 2s
+  inventory-service:
+    base-url: http://localhost:8082
+    connect-timeout: 500ms
+    read-timeout: 2s
