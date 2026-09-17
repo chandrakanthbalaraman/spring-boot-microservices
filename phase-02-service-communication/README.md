@@ -81,12 +81,24 @@ Copied from Phase 1, then evolved. Do not edit Phase 1 to “finish” Phase 2.
 
 ## How to Run
 
+Start databases once, then **three terminals** (order-service needs the other two).
+
+This folder’s `pom.xml` is a Maven **parent** (`packaging: pom`). It has no `@SpringBootApplication`. Running `mvn spring-boot:run` here fails with *Unable to find a suitable main class*. Pick a child module.
+
 ```bash
+# 1. Postgres (from repo root)
 cd infrastructure/docker/postgres && docker compose up -d
 
-cd phase-02-service-communication/product-service && mvn spring-boot:run
-cd phase-02-service-communication/inventory-service && mvn spring-boot:run
-cd phase-02-service-communication/order-service && mvn spring-boot:run
+# 2–4. One service per terminal, from this phase folder:
+mvn spring-boot:run -pl product-service
+mvn spring-boot:run -pl inventory-service
+mvn spring-boot:run -pl order-service
+```
+
+Same idea as Phase 1 if you prefer to `cd` into the service first:
+
+```bash
+cd product-service && mvn spring-boot:run
 ```
 
 ---

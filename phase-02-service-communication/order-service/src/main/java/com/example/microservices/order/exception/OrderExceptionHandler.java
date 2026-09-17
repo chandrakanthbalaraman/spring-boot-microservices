@@ -60,6 +60,16 @@ public class OrderExceptionHandler extends ResponseEntityExceptionHandler {
                 request);
     }
 
+    @ExceptionHandler(DownstreamServiceUnavailableException.class)
+    public ProblemDetail handleDownstreamServiceUnavailable(DownstreamServiceUnavailableException ex, HttpServletRequest request) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable", ex.getMessage(), "https://example.com/problems/service-unavailable", request);
+    }
+
+    @ExceptionHandler(DownstreamServiceException.class)
+    public ProblemDetail handleDownstreamServiceException(DownstreamServiceException ex, HttpServletRequest request) {
+        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), "https://example.com/problems/internal-server-error", request);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ProblemDetail handleDataIntegrityViolation(
             DataIntegrityViolationException ex,

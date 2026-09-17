@@ -26,3 +26,5 @@ Format: `YYYY-MM-DD | Phase | STATUS | note — evidence`
 - 2026-09-15 | 1 | PARTIAL | Break-it: learner stopped product-service and inventory-service; order-service surfaced RestClientException via ProblemDetail. Gaps: basic integration tests, phase README
 - 2026-09-15 | 1 | DONE | Phase README at `phase-01-microservices-basics/README.md`. Basic integration testing **N/A (intentional)** — skipped by learner. Next: Phase 2 (do not create folder until the slice starts).
 - 2026-09-16 | 2 | PARTIAL | Folder `phase-02-service-communication/` copied from Phase 1; parent POM retargeted. Timeout keys in order-service `application.yml`; `RestClientConfig` still has no request factory. Gaps: timeouts, 502/503 mapping, Feign, WebClient, idempotency
+- 2026-09-16 | 1+2 | Trello | Phase 01 card → Done; Phase 02 card → In Progress. Descs match repo (P1 DONE tests N/A; P2 PARTIAL folder + yml keys).
+- 2026-09-16 | 1+2 | Notion | SB-MS Second Brain + Phase 01/02 + Board snapshot + T6 N/A + T7 DONE. Orbit Second Brain not touched.

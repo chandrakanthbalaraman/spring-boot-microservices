@@ -544,7 +544,7 @@ public interface InventoryClient {
 
 ### Learn
 
-- [ ] RestClient
+- [x] RestClient (copied from Phase 1; timeouts still open)
 - [ ] WebClient
 - [ ] OpenFeign
 - [ ] HTTP timeouts
@@ -558,7 +558,7 @@ public interface InventoryClient {
 
 ### Hands-on
 
-- [ ] Replace ad-hoc REST calls with RestClient and/or WebClient
+- [x] Replace ad-hoc REST calls with RestClient and/or WebClient (RestClient exists; WebClient still open)
 - [ ] Implement OpenFeign `InventoryClient`
 - [ ] Configure timeouts and connection pooling
 - [ ] Handle client errors without leaking internals

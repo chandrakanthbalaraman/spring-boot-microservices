@@ -33,6 +33,10 @@ logging:
 clients:
   product-service:
     base-url: http://localhost:8081
+    connect-timeout: 2s
+    read-timeout: 2s
 
   inventory-service:
     base-url: http://localhost:8082
+    connect-timeout: 2s
+    read-timeout: 2s

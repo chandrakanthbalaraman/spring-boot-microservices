@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 2 — folder scaffolded (`phase-02-service-communication/`) · first slice: RestClient timeouts (not wired yet) · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) · [Phase 02](https://trello.com/c/Zkxt4CVl)**
+**Phase 2 — folder scaffolded (`phase-02-service-communication/`) · Slice A timeouts not wired · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -214,5 +214,5 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
 - [x] `.cursor/{agents,skills,commands,rules}` symlink to `.claude/` (2026-08-26)
-- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-15)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-15)
+- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-16)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-16)

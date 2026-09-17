@@ -35,7 +35,9 @@ clients:
     base-url: http://localhost:8081
     connect-timeout: 500ms
     read-timeout: 2s
+
   inventory-service:
     base-url: http://localhost:8082
     connect-timeout: 500ms
     read-timeout: 2s
+  
