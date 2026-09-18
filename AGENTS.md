@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 2 — folder scaffolded (`phase-02-service-communication/`) · Slice A timeouts not wired · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress**
+**Phase 2 — Slice D done (WebClient product GET) · E open (idempotency) · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -127,6 +127,7 @@ Naming: `{team}-{role}.md`. Sketch; do not unsupervised-implement full features 
 | `review-pr` / `review-security` / `review-performance` / `review-api` / `review-trello` | Structured reviews |
 | `generate-dockerfile` / `generate-helm` / `generate-terraform` | Container / K8s / IaC sketches |
 | `spring-boot-development` | Canonical Boot layering for this repo |
+| `write-slice-lesson` | Step-by-step phase-slice lesson (core insight → steps → break-it → verify checklist) |
 
 ### `rules/` — always-on constraints
 
@@ -146,6 +147,7 @@ One topic per file. If a rule still names Orbit, apply the **SB-MS interpretatio
 | `logging.md` / `kafka.md` / `redis.md` | Telemetry and data-plane discipline |
 | `phase-status.md` | Honest Current phase; evidence before DONE |
 | `documentation.md` | ADRs, runbooks, notes |
+| `write-slice-lesson.md` | Slice lessons in chat (WebClient step template); no docs dump |
 
 ### `memory/` — durable knowledge
 
@@ -168,6 +170,7 @@ One topic per file. If a rule still names Orbit, apply the **SB-MS interpretatio
 | `/migrate` | Flyway-only schema change |
 | `/sync-phase-status` | Current phase + `sb-roadmap.md` from evidence |
 | `/generate-phase-infographic` | Phase architecture PNG under `docs/` |
+| `/write-slice-lesson` | Step-by-step slice walkthrough (learner implements; agent guides) |
 | `/create-phase-branch` | `feature/phase-{N}-{slug}` |
 
 ---

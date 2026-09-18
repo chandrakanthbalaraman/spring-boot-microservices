@@ -17,5 +17,6 @@ user-invocable: false
 - Operational behavior → runbook in /docs/runbooks.
 - Perf claims → /docs/benchmarks with numbers.
 - Phase architecture posters → /docs/phases (handwritten sketch; no status chrome — rule `phase-infographic.md`).
+- Phase-slice **lessons** → chat (`/write-slice-lesson`). Optional learner notes under `docs/tutor/`. Do not add `docs/phases/.../slices/` unless the user says `file`.
 - Keep /.claude/memory/* dated and terse.
 - Standing phase deliverables include diagrams, ADRs, security/perf/PRR checklists.

@@ -27,7 +27,21 @@
 
     <properties>
         <java.version>21</java.version>
+        <!-- Northfields: Spring Cloud train for Boot 3.5.x. Import only; do not add Feign to product/inventory. -->
+        <spring-cloud.version>2025.0.3</spring-cloud.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <!-- Inherited by every service in this phase. Drop a starter here only if all three need it. -->
     <dependencies>

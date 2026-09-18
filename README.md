@@ -22,7 +22,7 @@ Full checklist: [`sb-roadmap.md`](./sb-roadmap.md).
 | **JDK 21** | Language / runtime (`java -version`) |
 | **Docker** + Compose | Local Postgres (later Redis, Kafka, observability) |
 | **Git** | One repo, tags per phase (`phase-01-complete`, …) |
-| **Maven Wrapper** | Per-phase `./mvnw` once Phase 1 exists — no system Maven required |
+| **Maven 3.9+** | Each phase has its own parent POM (`mvn` on the PATH). Wrappers (`./mvnw`) are not in these folders yet |
 
 ---
 
@@ -59,12 +59,18 @@ spring-boot-microservices/          # this repo (folder: SB-MS)
 └── capstone/                       consolidated production architecture
 ```
 
-Each phase has its **own Maven parent**. Run folder-by-folder:
+Each phase has its **own Maven parent**. Build from the phase folder (or a service module), then run folder-by-folder:
 
 ```bash
-cd phase-01-microservices-basics/product-service
-./mvnw spring-boot:run
+# Refresh deps after POM changes (-U forces Maven to re-check remote metadata)
+cd phase-01-microservices-basics
+mvn clean install -U
+
+cd product-service
+mvn spring-boot:run
 ```
+
+Same pattern for later phases, for example `phase-02-service-communication/order-service`. `clean install -U` is the command to re-run after adding a client library (RestClient factory, OpenFeign, WebClient) so the new artifacts actually land on the classpath.
 
 ---
 

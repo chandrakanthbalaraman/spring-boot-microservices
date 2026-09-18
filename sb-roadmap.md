@@ -115,7 +115,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | # | Phase | Folder | Status |
 |---|-------|--------|--------|
 | 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | DONE (tests N/A) |
-| 02 | Inter-Service Communication | `phase-02-service-communication/` | PARTIAL |
+| 02 | Inter-Service Communication | `phase-02-service-communication/` | PARTIAL (A+B done; C Feign scaffolded; D–E open) |
 | 03 | Service Discovery | `phase-03-service-discovery/` | [ ] |
 | 04 | Load Balancing | `phase-04-load-balancing/` | [ ] |
 | 05 | API Gateway | `phase-05-api-gateway/` | [ ] |
@@ -529,6 +529,8 @@ inventory-service DOWN → order-service → timeout → bad user experience
 
 Remove naive HTTP wiring. Standardize clients, timeouts, errors, and contracts.
 
+Learner notes + carousel: [`docs/phases/phase-2/`](./docs/phases/phase-2/) · poster: [`docs/phases/phase-2.png`](./docs/phases/phase-2.png) · ADRs: [`0001`](./docs/adr/0001-restclient-timeouts-and-downstream-mapping.md) · [`0002`](./docs/adr/0002-openfeign-inventory-only.md)
+
 ```
 Order Service ── REST ──► Inventory Service
 Order Service ── Feign ─► Inventory Service
@@ -542,31 +544,43 @@ public interface InventoryClient {
 }
 ```
 
+### Slices (do in order — do not dump the phase)
+
+| Slice | Lesson | Status |
+|-------|--------|--------|
+| **A** | RestClient **timeouts** — `ClientHttpRequestFactory` from `clients.*.connect-timeout` / `read-timeout` (500ms / 2s) | DONE |
+| **B** | **Error mapping** — `ResourceAccessException` → 503; unmapped HTTP → 502; domain 404/400 stay 404/409 ProblemDetail | DONE |
+| **C** | OpenFeign `InventoryClient` (keep RestClient on the other neighbor) | DONE — Feign inventory; product moved to WebClient in D |
+| **D** | WebClient — one GET; blocking vs reactive | DONE — `ProductWebClient` + `WebClientConfig` (product GET); `.block()` in MVC; Feign inventory unchanged |
+| **E** | `Idempotency-Key` on `POST /api/v1/orders` | [ ] |
+| **+** | Explicit connection **pooling** on the request factory | [ ] |
+| **Break** | After each slice: stop a neighbor, POST an order, write what you saw | DONE for A–D |
+
 ### Learn
 
-- [x] RestClient (copied from Phase 1; timeouts still open)
-- [ ] WebClient
-- [ ] OpenFeign
-- [ ] HTTP timeouts
-- [ ] Connection pooling
-- [ ] Serialization / deserialization
-- [ ] Error handling
-- [ ] API versioning
+- [x] RestClient (named beans `productRestClient` / `inventoryRestClient` — comparison artifacts; live product path is WebClient)
+- [x] WebClient (`ProductWebClient` + `WebClientConfig`; product GET with `.block()`)
+- [x] OpenFeign (`InventoryFeignApi` + `InventoryErrorDecoder`; inventory reserve/release)
+- [x] HTTP timeouts (connect 500ms, read 2s, wired in `RestClientConfig`)
+- [ ] Connection pooling (explicit sizing — `detect()` is not a pool policy)
+- [x] Serialization / deserialization (Jackson `body(...)` on RestClient — inherited)
+- [x] Error handling (typed downstream exceptions + ProblemDetail 503/500/404/409)
+- [x] API versioning (`/api/v1/...` inherited; not changed this phase)
 - [ ] Idempotency
-- [ ] Synchronous communication
+- [x] Synchronous communication
 - [ ] Asynchronous communication (awareness; Kafka comes in Phase 10)
 
 ### Hands-on
 
-- [x] Replace ad-hoc REST calls with RestClient and/or WebClient (RestClient exists; WebClient still open)
-- [ ] Implement OpenFeign `InventoryClient`
-- [ ] Configure timeouts and connection pooling
-- [ ] Handle client errors without leaking internals
-- [ ] Version APIs
+- [x] Replace ad-hoc REST calls with RestClient (WebClient now on product GET)
+- [x] Implement OpenFeign `InventoryClient` (Feign on inventory)
+- [x] Configure timeouts (`timeoutFactory` + YAML; WebClient via Reactor Netty `HttpClient`). Pooling still open.
+- [x] Handle client errors without leaking internals (503/502 ProblemDetail, named service, no stack)
+- [x] Version APIs (inherited `/api/v1`)
 - [ ] Make mutating calls idempotent where needed
-- [ ] Move beyond simple REST calls (prepare for discovery)
+- [x] Move beyond simple REST calls (prepare for discovery) — Feign `name` is the future Eureka id; `url` still localhost
 
-**Next:** Remove hard-coded service URLs.
+**Next slice in this phase:** E — Idempotency-Key. **Next phase after E:** remove hard-coded service URLs (Phase 03).
 
 ---
 

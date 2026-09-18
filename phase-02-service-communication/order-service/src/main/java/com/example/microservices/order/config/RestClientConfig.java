@@ -26,6 +26,11 @@ public class RestClientConfig {
                 properties.connectTimeout(), properties.readTimeout());
     }
 
+    /**
+     * Slice C keeps this bean so RestClient inventory still compiles. After
+     * {@code OrderServiceImpl} switches to {@code InventoryFeignClient}, this
+     * client is unused — leave it as the comparison artifact, then delete it.
+     */
     @Bean(name = "inventoryRestClient")
     public RestClient inventoryRestClient(InventoryClientProperties properties) {
         return restClient("inventory-service", properties.baseUrl(),

@@ -30,6 +30,9 @@ Orbit entries below are **historical copies from the toolkit scaffold**. They do
 - 2026-08-25 | — | Curriculum: `sb-roadmap.md`. Learning loop: run → break → debug. Do not dump a whole phase unsupervised.
 - 2026-08-25 | — | Eureka is a teaching discovery tool; Kubernetes Service discovery supersedes it in later phases.
 - 2026-08-25 | — | Java 21 + Spring Boot 3.x + Maven (not Gradle). Constructor injection. Flyway when a service has a DB. No secrets in git.
+- 2026-09-16 | ADR-0001 | Named RestClient per neighbor; connect 500ms / read 2s; transport → 503, unmapped HTTP → 500; domain 404/400 stay domain. Feign/WebClient/idempotency not decided.
+- 2026-09-16 | ADR-0002 | OpenFeign on inventory only; product stays RestClient at decision time; `url` from `clients.inventory-service.base-url` until Phase 3. Transport → 503 (`RetryableException`); unmapped HTTP → 502.
+- 2026-09-17 | — | Slice D: product GET moved to WebClient (`ProductWebClient` + `.block()`); Feign remains on inventory. ADR-0002 inventory decision unchanged.
 - 2026-08-25 | — | GitHub repo `chandrakanthbalaraman/spring-boot-microservices`. Trello board https://trello.com/b/Cjb5ESUA/sb-ms-spring-boot-microservices in workspace “chandrakanth balaraman's Projects” (MCP cannot create a new Trello org). Card map: `docs/trello.md`. Trello is an optional mirror.
 
 ## Entries (Orbit scaffold — do not apply)

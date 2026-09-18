@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import com.example.microservices.order.client.InventoryClient;
 import com.example.microservices.order.client.ProductClient;
-import com.example.microservices.order.client.dto.InventoryResponse;
 import com.example.microservices.order.client.dto.ProductResponse;
+import com.example.microservices.order.client.webclient.ProductWebClient;
 import com.example.microservices.order.dto.OrderCreateRequest;
 import com.example.microservices.order.dto.OrderItemRequest;
 import com.example.microservices.order.mapper.OrderMapper;
@@ -29,9 +29,8 @@ import com.example.microservices.order.exception.OrderNotFoundException;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
-    private final ProductClient productClient;
     private final InventoryClient inventoryClient;
-    
+    private final ProductWebClient productWebClient;
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request) {
@@ -46,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
             // Add Items to Order
             for (OrderItemRequest itemRequest : request.getItems()) {
                 // Get Product from Product Service
-                ProductResponse product = productClient.getProductByProductId(itemRequest.getProductId());
+                ProductResponse product = productWebClient.getProductByProductId(itemRequest.getProductId());
                 // Reserve Stock from Inventory Service
                 inventoryClient.reserveStockByProductId(itemRequest.getProductId(), itemRequest.getQuantity());
                 // Add Item to Processed Items

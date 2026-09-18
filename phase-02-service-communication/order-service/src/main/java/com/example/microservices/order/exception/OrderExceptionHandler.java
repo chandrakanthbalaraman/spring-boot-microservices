@@ -19,6 +19,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import feign.RetryableException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -45,7 +46,12 @@ public class OrderExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RestClientException.class)
     public ProblemDetail handleRestClientException(RestClientException ex, HttpServletRequest request) {
-        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", ex.getMessage(), "https://example.com/problems/internal-server-error", request);
+        return problem(
+            HttpStatus.SERVICE_UNAVAILABLE,
+            "Service Unavailable",
+            "A downstream service is unavailable.",
+            "https://example.com/problems/service-unavailable",
+            request);
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
@@ -60,6 +66,21 @@ public class OrderExceptionHandler extends ResponseEntityExceptionHandler {
                 request);
     }
 
+    /**
+     * Feign connect/read/refused never hits {@code ErrorDecoder}. Same 503 story as
+     * RestClient {@code ResourceAccessException} → {@code DownstreamServiceUnavailableException}.
+     * Only inventory uses Feign in Slice C, so the detail can name that neighbor.
+     */
+    @ExceptionHandler(RetryableException.class)
+    public ProblemDetail handleFeignRetryable(RetryableException ex, HttpServletRequest request) {
+        return problem(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Service Unavailable",
+                "inventory-service unavailable",
+                "https://example.com/problems/service-unavailable",
+                request);
+    }
+
     @ExceptionHandler(DownstreamServiceUnavailableException.class)
     public ProblemDetail handleDownstreamServiceUnavailable(DownstreamServiceUnavailableException ex, HttpServletRequest request) {
         return problem(HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable", ex.getMessage(), "https://example.com/problems/service-unavailable", request);
@@ -67,7 +88,7 @@ public class OrderExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DownstreamServiceException.class)
     public ProblemDetail handleDownstreamServiceException(DownstreamServiceException ex, HttpServletRequest request) {
-        return problem(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), "https://example.com/problems/internal-server-error", request);
+        return problem(HttpStatus.BAD_GATEWAY, "Downstream Service Error", ex.getMessage(), "https://example.com/problems/bad-gateway", request);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
