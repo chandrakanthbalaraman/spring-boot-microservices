@@ -52,12 +52,12 @@ ln -sf AGENTS.md CLAUDE.md
 
 | Agent does | Learner does |
 |------------|--------------|
-| Teach WHY / WHAT / HOW for the current phase slice | IMPLEMENT in the phase folder |
+| Teach WHY / WHAT / HOW for the current phase slice | IMPLEMENT under `services/` on the phase branch |
 | Create phase Maven shells, package dirs, README checklists | Run, break, debug |
 | Review **their** diffs against `.claude/rules/` | Fix failures |
 | Wire Compose / Flyway **sketches** when asked | Own service behavior and tests |
 
-**Allowed agent writes by default:** phase folder scaffold, parent/child POMs, `package-info` / empty application class, README checklists, docs/ADR stubs, infrastructure Compose stubs.
+**Allowed agent writes by default:** `services/` scaffold, parent/child POMs, `package-info` / empty application class, README checklists, docs/ADR stubs, infrastructure Compose stubs.
 
 **Forbidden by default:** filling in a complete working order flow, Feign clients, saga, or security config as a one-shot dump.
 
@@ -93,7 +93,7 @@ Every session should:
 2. Confirm the phase with the learner, or use that line.
 3. Read **only** that phase in `sb-roadmap.md`.
 4. Prefer `/sync-phase-status` over guessing DONE.
-5. Create the next phase folder **only if** the learner asks (or `/create-phase-branch`).
+5. Start the next phase with `/create-phase-branch` — same `services/` tree, no new folder copy.
 
 Do not load all 25 phases. Do not skip more than one phase without an explicit request.
 
@@ -103,7 +103,7 @@ Do not load all 25 phases. Do not skip more than one phase without an explicit r
 
 When asked to start Phase 1:
 
-- **Generate:** repo files already in this toolkit, `phase-01-microservices-basics/` Maven parent, three service modules, layered packages, README checklist, Docker Postgres stub.
+- **Generate:** repo files already in this toolkit, `services/` Maven parent, three service modules, layered packages, README checklist, Docker Postgres stub.
 - **Leave as TODO:** product/inventory/order business rules, REST call wiring, validation messages, failure-handling behavior — unless the learner asked to pair.
 
 Never write the whole three-service happy path in one answer.

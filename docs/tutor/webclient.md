@@ -30,7 +30,7 @@ product :8081              inventory :8082
 
 ## Step 1 — Add the dependency
 
-In `phase-02-service-communication/order-service/pom.xml`, add one dependency. Do not add `spring-boot-starter-webflux` to the other services — the reactive runtime stays in order-service only.
+In `services/order-service/pom.xml`, add one dependency. Do not add `spring-boot-starter-webflux` to the other services — the reactive runtime stays in order-service only.
 
 ```xml
 <dependency>

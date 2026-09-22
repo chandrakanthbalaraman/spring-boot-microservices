@@ -18,7 +18,7 @@ user-invocable: false
 - This repository is **Spring Boot Microservices** (`SB-MS`), not Orbit.
 - Canonical brief: `/AGENTS.md` (symlinked as `CLAUDE.md` and `agents.md`).
 - Curriculum: `/sb-roadmap.md`. Cursor overlay: `/cursor.md`.
-- One Git repo + independently runnable **phase folders**. Do not create all 25 phases up front.
-- Database-per-service. Maven per phase (not one giant reactor on day one).
+- One Git repo + one runnable **`services/`** tree. Phases are **branches + tags**, not duplicate folders.
+- Database-per-service. One **services** Maven parent (not a repo-root reactor on day one).
 - If another rule, agent, or skill still says Orbit / `com.orbit` / Maven single-module monolith / “never package-by-feature”, follow **this rule and `AGENTS.md`**.
 - Edit `.claude/` only. `.cursor/{agents,skills,commands,rules}` are symlinks.

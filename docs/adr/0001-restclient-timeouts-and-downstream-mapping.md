@@ -2,7 +2,7 @@
 
 - **Status:** Accepted (Phase 2, Slices A + B)
 - **Date:** 2026-09-16
-- **Phase:** `phase-02-service-communication/`
+- **Phase:** `services/`
 
 ## Context
 

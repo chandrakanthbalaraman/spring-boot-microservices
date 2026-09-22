@@ -1,6 +1,11 @@
 # Prompt template — one carousel slide
 
-Fill every `{{…}}`. Pass matching `reference_image_paths` from `docs/phases/reference/cache/`.
+Fill every `{{…}}`. Pass matching `reference_image_paths`:
+
+- **cache family** — `docs/phases/reference/cache/{n}.jpg`
+- **api-gateway family** (interview-dense) — `docs/phases/reference/api-gateway/{n}.jpg` plus tokens in [`api-gateway-style.md`](api-gateway-style.md)
+
+Pack catalog: [`docs/phases/README.md`](../../../../docs/phases/README.md).
 
 ```
 Create a 1:1 LinkedIn/Instagram educational carousel slide.

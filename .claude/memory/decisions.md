@@ -23,7 +23,8 @@ Orbit entries below are **historical copies from the toolkit scaffold**. They do
 
 ## Entries (SB-MS)
 
-- 2026-08-25 | — | One Git repo; independently runnable phase folders; do not create all 25 phases up front.
+- 2026-09-21 | — | **Branch-based phases:** one runnable tree [`services/`]; `feature/phase-{NN}-{slug}` + tags `phase-{NN}-complete`. Supersedes per-phase folders (`phase-01-*`, `phase-02-*`, …).
+- 2026-08-25 | — | One Git repo; do not create all 25 phase snapshots up front (now: one `services/` tree + Git).
 - 2026-08-25 | — | `.claude/` is source of truth; `.cursor/{agents,skills,commands,rules}` and `CLAUDE.md` are symlinks. Canonical brief: `AGENTS.md` (same path as `agents.md` on macOS).
 - 2026-08-25 | — | Microservices from Phase 1 (product, inventory, order) — not a layered monolith first.
 - 2026-08-25 | — | Database-per-service. Maven per phase. Package-by-layer per service first; package-by-feature later if earned.
@@ -33,6 +34,7 @@ Orbit entries below are **historical copies from the toolkit scaffold**. They do
 - 2026-09-16 | ADR-0001 | Named RestClient per neighbor; connect 500ms / read 2s; transport → 503, unmapped HTTP → 500; domain 404/400 stay domain. Feign/WebClient/idempotency not decided.
 - 2026-09-16 | ADR-0002 | OpenFeign on inventory only; product stays RestClient at decision time; `url` from `clients.inventory-service.base-url` until Phase 3. Transport → 503 (`RetryableException`); unmapped HTTP → 502.
 - 2026-09-17 | — | Slice D: product GET moved to WebClient (`ProductWebClient` + `.block()`); Feign remains on inventory. ADR-0002 inventory decision unchanged.
+- 2026-09-17 | — | Slice E: `Idempotency-Key` required on `POST /api/v1/orders`; unique key + payload fingerprint in `order_db` (`V002`). Same key+body replays; mismatch → 409. Not Redis (Phase 11).
 - 2026-08-25 | — | GitHub repo `chandrakanthbalaraman/spring-boot-microservices`. Trello board https://trello.com/b/Cjb5ESUA/sb-ms-spring-boot-microservices in workspace “chandrakanth balaraman's Projects” (MCP cannot create a new Trello org). Card map: `docs/trello.md`. Trello is an optional mirror.
 
 ## Entries (Orbit scaffold — do not apply)

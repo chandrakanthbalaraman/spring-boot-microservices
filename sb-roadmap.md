@@ -94,10 +94,10 @@ CONCEPT → WHY IT EXISTS → ARCHITECTURE → MINIMAL CODE → RUN IT
 ### Learning Rules
 
 - [ ] One Git repository for the entire journey (not 25 repos)
-- [ ] Each phase is independently runnable
-- [ ] Later phases evolve the same application; do not throw away code
+- [ ] One runnable code tree: [`services/`](services/) — phases are **branches + tags**, not duplicate folders
+- [ ] Later phases evolve the same application in `services/`; do not throw away code
 - [ ] Do **not** dump an entire phase codebase in one shot
-- [ ] Do **not** create all 25 phase folders up front — start with Phase 1 only
+- [ ] Do **not** copy `services/` per phase — open `feature/phase-{NN}-{slug}`, merge to `main`, tag `phase-{NN}-complete`
 - [ ] Treat Spring Cloud Gateway, Eureka, Resilience4j, Kafka, Redis, OpenTelemetry, Prometheus/Grafana, Docker, and Kubernetes as **architectural tools**, not disconnected features
 - [ ] Learn Eureka for discovery concepts, then compare it to Kubernetes Service discovery so it is not over-taught
 
@@ -112,33 +112,35 @@ Kubernetes deployment  →  Kubernetes Service Discovery
 
 Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring-boot-microservices) — card URLs in [`docs/trello.md`](./docs/trello.md). GitHub: https://github.com/chandrakanthbalaraman/spring-boot-microservices
 
-| # | Phase | Folder | Status |
-|---|-------|--------|--------|
-| 01 | Microservices Architecture Fundamentals | `phase-01-microservices-basics/` | DONE (tests N/A) |
-| 02 | Inter-Service Communication | `phase-02-service-communication/` | PARTIAL (A+B done; C Feign scaffolded; D–E open) |
-| 03 | Service Discovery | `phase-03-service-discovery/` | [ ] |
-| 04 | Load Balancing | `phase-04-load-balancing/` | [ ] |
-| 05 | API Gateway | `phase-05-api-gateway/` | [ ] |
-| 06 | Configuration Management | `phase-06-configuration/` | [ ] |
-| 07 | Resilience Engineering | `phase-07-resilience/` | [ ] |
-| 08 | Database Architecture | `phase-08-database/` | [ ] |
-| 09 | Distributed Transactions / Saga | `phase-09-saga/` | [ ] |
-| 10 | Kafka & Event-Driven Architecture | `phase-10-kafka/` | [ ] |
-| 11 | Distributed Cache (Redis) | `phase-11-redis/` | [ ] |
-| 12 | Security | `phase-12-security/` | [ ] |
-| 13 | WebSockets & Real-Time Systems | `phase-13-websocket/` | [ ] |
-| 14 | Distributed Tracing | `phase-14-tracing/` | [ ] |
-| 15 | Centralized Logging | `phase-15-logging/` | [ ] |
-| 16 | Observability | `phase-16-observability/` | [ ] |
-| 17 | Docker & Containerization | `phase-17-docker/` | [ ] |
-| 18 | Kubernetes | `phase-18-kubernetes/` | [ ] |
-| 19 | Kubernetes Production Architecture | `phase-19-kubernetes-production/` | [ ] |
-| 20 | CI/CD | `phase-20-cicd/` | [ ] |
-| 21 | Testing Microservices | `phase-21-testing/` | [ ] |
-| 22 | Performance & Scalability | `phase-22-performance/` | [ ] |
-| 23 | Advanced Distributed Systems | `phase-23-distributed-systems/` | [ ] |
-| 24 | Production Architecture Patterns | `phase-24-production-patterns/` | [ ] |
-| 25 | Capstone: Enterprise Commerce Platform | `capstone/` | [ ] |
+| # | Phase | Branch / tag | Status |
+|---|-------|--------------|--------|
+| 01 | Microservices Architecture Fundamentals | tag `phase-01-complete` | DONE (tests N/A) |
+| 02 | Inter-Service Communication | `feature/phase-02-*` → `main` | PARTIAL (A+B done; C Feign scaffolded; D–E open) |
+| 03 | Service Discovery | `feature/phase-03-service-discovery` | [ ] |
+| 04 | Load Balancing | `feature/phase-04-load-balancing` | [ ] |
+| 05 | API Gateway | `feature/phase-05-api-gateway` | [ ] |
+| 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
+| 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
+| 08 | Database Architecture | `feature/phase-08-database` | [ ] |
+| 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
+| 10 | Kafka & Event-Driven Architecture | `feature/phase-10-kafka` | [ ] |
+| 11 | Distributed Cache (Redis) | `feature/phase-11-redis` | [ ] |
+| 12 | Security | `feature/phase-12-security` | [ ] |
+| 13 | WebSockets & Real-Time Systems | `feature/phase-13-websocket` | [ ] |
+| 14 | Distributed Tracing | `feature/phase-14-tracing` | [ ] |
+| 15 | Centralized Logging | `feature/phase-15-logging` | [ ] |
+| 16 | Observability | `feature/phase-16-observability` | [ ] |
+| 17 | Docker & Containerization | `feature/phase-17-docker` | [ ] |
+| 18 | Kubernetes | `feature/phase-18-kubernetes` | [ ] |
+| 19 | Kubernetes Production Architecture | `feature/phase-19-kubernetes-production` | [ ] |
+| 20 | CI/CD | `feature/phase-20-cicd` | [ ] |
+| 21 | Testing Microservices | `feature/phase-21-testing` | [ ] |
+| 22 | Performance & Scalability | `feature/phase-22-performance` | [ ] |
+| 23 | Advanced Distributed Systems | `feature/phase-23-distributed-systems` | [ ] |
+| 24 | Production Architecture Patterns | `feature/phase-24-production-patterns` | [ ] |
+| 25 | Capstone: Enterprise Commerce Platform | `feature/capstone` · folder `capstone/` (late) | [ ] |
+
+All application code for phases **01–24** lives in [`services/`](services/) on the checked-out branch. Use `git checkout phase-01-complete` (or a phase branch) to see that milestone — not a second folder tree.
 
 **Recommended sequence**
 
@@ -156,118 +158,79 @@ START → 01 Architecture → 02 REST/Feign → 03 Discovery → 04 Load Balanci
 
 ## Repository Structure
 
-One repo. Each phase is a snapshot/evolution of the previous phase. Independently runnable. Reusable shared modules and infrastructure. Portfolio-ready on GitHub.
+One repo. One evolving **`services/`** tree. Phases are **Git branches** merged to `main` and **tags** for milestones — not duplicate phase folders. Reusable shared modules and infrastructure. Portfolio-ready on GitHub.
 
 ```
 spring-boot-microservices/
 │
 ├── README.md
-├── .gitignore
-├── pom.xml
+├── sb-roadmap.md
+├── AGENTS.md
 │
-├── docs/
-│   ├── architecture/
-│   ├── decisions/
-│   └── notes/
+├── docs/                    architecture, ADRs, phase carousels (docs/phases/)
+├── shared/                  common-model, … (when earned)
+├── infrastructure/docker/   Postgres, later Redis/Kafka/obs
 │
-├── shared/
-│   ├── common-model/
-│   ├── common-exception/
-│   └── common-util/
+├── services/                ← all phase work (single Maven parent)
+│   ├── pom.xml
+│   ├── README.md
+│   ├── product-service/
+│   ├── inventory-service/
+│   └── order-service/
 │
-├── infrastructure/
-│   ├── docker/
-│   ├── postgres/
-│   ├── redis/
-│   ├── kafka/
-│   └── observability/
-│
-├── phase-01-microservices-basics/
-├── phase-02-service-communication/
-├── phase-03-service-discovery/
-├── phase-04-load-balancing/
-├── phase-05-api-gateway/
-├── phase-06-configuration/
-├── phase-07-resilience/
-├── phase-08-database/
-├── phase-09-saga/
-├── phase-10-kafka/
-├── phase-11-redis/
-├── phase-12-security/
-├── phase-13-websocket/
-├── phase-14-tracing/
-├── phase-15-logging/
-├── phase-16-observability/
-├── phase-17-docker/
-├── phase-18-kubernetes/
-├── phase-19-kubernetes-production/
-├── phase-20-cicd/
-├── phase-21-testing/
-├── phase-22-performance/
-├── phase-23-distributed-systems/
-├── phase-24-production-patterns/
-│
-└── capstone/
-    ├── README.md
-    ├── api-gateway/
-    ├── user-service/
-    ├── product-service/
-    ├── inventory-service/
-    ├── order-service/
-    ├── payment-service/
-    ├── shipping-service/
-    └── notification-service/
+└── capstone/                late — consolidated production layout (optional split)
 ```
 
-**Evolution (conceptual)** — each phase adds one capability; do not blindly duplicate forever. Capstone consolidates reusable pieces into a clean production architecture.
+**Evolution (conceptual)** — each phase adds one capability inside `services/` on a feature branch; merge forward. Capstone may split or consolidate into `capstone/` when earned.
 
 ```
-phase-01  → add communication      → phase-02
-          → add discovery          → phase-03
-          → add load balancing     → phase-04
-          → add gateway            → phase-05
-          → …                      → capstone
+main @ phase-01-complete  →  branch phase-02  →  merge  →  tag phase-02-complete
+                          →  branch phase-03  →  merge  →  tag phase-03-complete
+                          →  …                →  capstone
 ```
 
 ### Git Strategy
 
-One repository + tags for milestones. Work on `main` for learning.
+One repository. **`services/`** is always the app root. Phases are **feature branches** + **milestone tags**.
 
 - [x] Initialize one repo (`spring-boot-microservices`)
-- [ ] Commit per phase increment: `phase 01: implement service-to-service communication`
-- [ ] Tag milestones: `phase-01-complete`, `phase-02-complete`, … `capstone`
-- [x] Do **not** maintain 25 separate repositories
+- [x] Single code tree: `services/` (replaces per-phase folders)
+- [ ] Start each phase: `git checkout main && git pull && git checkout -b feature/phase-{NN}-{slug}` (see create-phase-branch skill)
+- [ ] Commit per slice; merge phase branch to `main` when the phase checklist is honest
+- [ ] Tag on `main` after each phase: `phase-01-complete`, `phase-02-complete`, … `capstone`
+- [x] Do **not** maintain 25 separate repositories or 25 copies of `services/`
 
 ```
-main
+main ──merge── feature/phase-03-service-discovery
  │
- ├── phase-01-complete
- ├── phase-02-complete
- ├── phase-03-complete
- ├── phase-04-complete
+ ├── tag phase-01-complete    (checkout to replay Phase 1 code)
+ ├── tag phase-02-complete
+ ├── tag phase-03-complete
  │
- └── capstone
+ └── tag capstone
 ```
+
+**Replay an older phase:** `git checkout phase-01-complete` — same paths (`services/order-service/…`), no duplicate folder tree.
 
 ### Maven Structure
 
-Root parent exists eventually, but **each phase has its own Maven parent** so you can run folder-by-folder.
+One **services** Maven parent for phases 1–24 (not a repo-root reactor yet).
 
 ```
-phase-01-microservices-basics/
-├── pom.xml
+services/
+├── pom.xml                 # artifactId: services
 ├── product-service/pom.xml
 ├── inventory-service/pom.xml
 └── order-service/pom.xml
 ```
 
-- [x] Enter one service and run: `cd phase-01-microservices-basics/product-service && ./mvnw spring-boot:run`
-- [x] Repeat for inventory-service and order-service
-- [x] Do **not** force one giant Maven reactor on day one
+- [x] Build from `services/`: `cd services && mvn clean install -U`
+- [x] Run one service: `cd services/product-service && mvn spring-boot:run` (or `mvn spring-boot:run -pl product-service` from `services/`)
+- [x] Do **not** force one giant repo-root Maven reactor on day one
 
 ### Phase README Template
 
-Every phase folder gets a `README.md` with:
+[`services/README.md`](services/README.md) is the runnable how-to; each phase adds notes under `docs/architecture/` and carousels under `docs/phases/`. Checklist sections:
 
 - [x] Objective
 - [x] Architecture
@@ -365,16 +328,16 @@ docs/
 
 ---
 
-## Bootstrap (before Phase 1 code)
+## Bootstrap (initial repo layout)
 
-Do **not** create all 25 phases yet. Start with only:
+One `services/` tree from day one. Phases add Git branches — not new folders:
 
 ```
 spring-boot-microservices/
 ├── README.md
 ├── docs/
 ├── infrastructure/
-└── phase-01-microservices-basics/
+└── services/
     ├── README.md
     ├── pom.xml
     ├── product-service/
@@ -402,7 +365,7 @@ Repository → Parent Maven → Product Service → Database → Product APIs
 
 **Goal:** Understand why microservices exist and build the first multi-service application.
 
-**Folder:** `phase-01-microservices-basics/`
+**Branch / tag:** tag `phase-01-complete` · **Work in:** [`services/`](services/) (replay with `git checkout phase-01-complete` when the tag exists)
 
 **Starting lesson:** Build `product-service` + `inventory-service` + `order-service` with project structure, Maven, PostgreSQL, REST APIs, service-to-service communication, and the first real order flow.
 
@@ -476,7 +439,7 @@ Responsible for: `id`, `customerId`, `status`, `totalAmount`
 
 ### Hands-on
 
-- [x] Independent Spring Boot apps in `spring-microservices/` (or `phase-01-microservices-basics/`)
+- [x] Independent Spring Boot apps under [`services/`](services/)
 - [x] Service layer, repository layer, DTOs, validation, error handling
 - [x] PostgreSQL + database-per-service (`product_db` :5433, `inventory_db` :5434, `order_db` :5435)
 - [x] Dockerized PostgreSQL
@@ -525,11 +488,11 @@ inventory-service DOWN → order-service → timeout → bad user experience
 
 # Phase 02 — Inter-Service Communication
 
-**Folder:** `phase-02-service-communication/`
+**Branch:** `feature/phase-02-*` → merge `main` · **Work in:** [`services/`](services/)
 
 Remove naive HTTP wiring. Standardize clients, timeouts, errors, and contracts.
 
-Learner notes + carousel: [`docs/phases/phase-2/`](./docs/phases/phase-2/) · poster: [`docs/phases/phase-2.png`](./docs/phases/phase-2.png) · ADRs: [`0001`](./docs/adr/0001-restclient-timeouts-and-downstream-mapping.md) · [`0002`](./docs/adr/0002-openfeign-inventory-only.md)
+Learner notes + carousel: [`docs/phases/phase-2/overview/`](./docs/phases/phase-2/overview/) · poster: [`docs/phases/posters/phase-2.png`](./docs/phases/posters/phase-2.png) · interview packs: [`clients`](./docs/phases/phase-2/clients/) · [`openfeign`](./docs/phases/phase-2/openfeign/) · catalog: [`docs/phases/README.md`](./docs/phases/README.md) · ADRs: [`0001`](./docs/adr/0001-restclient-timeouts-and-downstream-mapping.md) · [`0002`](./docs/adr/0002-openfeign-inventory-only.md)
 
 ```
 Order Service ── REST ──► Inventory Service
@@ -552,9 +515,9 @@ public interface InventoryClient {
 | **B** | **Error mapping** — `ResourceAccessException` → 503; unmapped HTTP → 502; domain 404/400 stay 404/409 ProblemDetail | DONE |
 | **C** | OpenFeign `InventoryClient` (keep RestClient on the other neighbor) | DONE — Feign inventory; product moved to WebClient in D |
 | **D** | WebClient — one GET; blocking vs reactive | DONE — `ProductWebClient` + `WebClientConfig` (product GET); `.block()` in MVC; Feign inventory unchanged |
-| **E** | `Idempotency-Key` on `POST /api/v1/orders` | [ ] |
+| **E** | `Idempotency-Key` on `POST /api/v1/orders` | DONE — required header; `V002` unique key + fingerprint; replay same body; 409 on mismatch |
 | **+** | Explicit connection **pooling** on the request factory | [ ] |
-| **Break** | After each slice: stop a neighbor, POST an order, write what you saw | DONE for A–D |
+| **Break** | After each slice: stop a neighbor, POST an order, write what you saw | DONE for A–E |
 
 ### Learn
 
@@ -566,7 +529,7 @@ public interface InventoryClient {
 - [x] Serialization / deserialization (Jackson `body(...)` on RestClient — inherited)
 - [x] Error handling (typed downstream exceptions + ProblemDetail 503/500/404/409)
 - [x] API versioning (`/api/v1/...` inherited; not changed this phase)
-- [ ] Idempotency
+- [x] Idempotency (`Idempotency-Key` on `POST /api/v1/orders`; unique key + fingerprint in `order_db`)
 - [x] Synchronous communication
 - [ ] Asynchronous communication (awareness; Kafka comes in Phase 10)
 
@@ -577,16 +540,18 @@ public interface InventoryClient {
 - [x] Configure timeouts (`timeoutFactory` + YAML; WebClient via Reactor Netty `HttpClient`). Pooling still open.
 - [x] Handle client errors without leaking internals (503/502 ProblemDetail, named service, no stack)
 - [x] Version APIs (inherited `/api/v1`)
-- [ ] Make mutating calls idempotent where needed
+- [x] Make mutating calls idempotent where needed (`Idempotency-Key` on create order)
 - [x] Move beyond simple REST calls (prepare for discovery) — Feign `name` is the future Eureka id; `url` still localhost
 
-**Next slice in this phase:** E — Idempotency-Key. **Next phase after E:** remove hard-coded service URLs (Phase 03).
+**Next slice in this phase:** explicit connection pooling. **Next phase after pooling:** remove hard-coded service URLs (Phase 03). Open branch `feature/phase-03-service-discovery` — same `services/` tree.
 
 ---
 
 # Phase 03 — Service Discovery
 
-**Folder:** `phase-03-service-discovery/`
+**Branch:** `feature/phase-03-service-discovery` · **Work in:** [`services/`](services/)
+
+Interview carousel (planned content, api-gateway style): [`docs/phases/phase-3/discovery/`](./docs/phases/phase-3/discovery/) · catalog: [`docs/phases/README.md`](./docs/phases/README.md)
 
 Replace `http://localhost:8082` with the logical name `inventory-service`.
 
@@ -633,7 +598,7 @@ Order → inventory-service → instance 1 / instance 2 / instance 3
 
 # Phase 04 — Load Balancing
 
-**Folder:** `phase-04-load-balancing/`
+**Branch:** `feature/phase-04-load-balancing` · **Work in:** [`services/`](services/)
 
 Scale services. Keep them stateless.
 
@@ -673,7 +638,7 @@ Scale services. Keep them stateless.
 
 # Phase 05 — API Gateway
 
-**Folder:** `phase-05-api-gateway/`
+**Branch:** `feature/phase-05-api-gateway` · **Work in:** [`services/`](services/)
 
 ```
                    Client
@@ -728,7 +693,7 @@ spring:
 
 # Phase 06 — Configuration Management
 
-**Folder:** `phase-06-configuration/`
+**Branch:** `feature/phase-06-configuration` · **Work in:** [`services/`](services/)
 
 ```
               Config Server
@@ -762,7 +727,7 @@ spring:
 
 # Phase 07 — Resilience Engineering
 
-**Folder:** `phase-07-resilience/`
+**Branch:** `feature/phase-07-resilience` · **Work in:** [`services/`](services/)
 
 One of the most important phases. Create failures on purpose.
 
@@ -810,7 +775,7 @@ public InventoryResponse checkInventory(String sku) {
 
 # Phase 08 — Database Architecture
 
-**Folder:** `phase-08-database/`
+**Branch:** `feature/phase-08-database` · **Work in:** [`services/`](services/)
 
 No direct database sharing between services.
 
@@ -851,7 +816,7 @@ Inventory Service ─► inventory_db
 
 # Phase 09 — Distributed Transactions
 
-**Folder:** `phase-09-saga/`
+**Branch:** `feature/phase-09-saga` · **Work in:** [`services/`](services/)
 
 This is where microservices become genuinely interesting. Major capstone building block.
 
@@ -899,7 +864,7 @@ Failure case: **Payment SUCCESS + Inventory FAILED**.
 
 # Phase 10 — Kafka & Event-Driven Architecture
 
-**Folder:** `phase-10-kafka/`
+**Branch:** `feature/phase-10-kafka` · **Work in:** [`services/`](services/)
 
 Transition from synchronous microservices toward event-driven systems.
 
@@ -941,7 +906,7 @@ Order Service ── OrderCreated ──► Kafka
 
 # Phase 11 — Distributed Cache
 
-**Folder:** `phase-11-redis/`
+**Branch:** `feature/phase-11-redis` · **Work in:** [`services/`](services/)
 
 ```
                  ┌─────────┐
@@ -990,7 +955,7 @@ public Product getProduct(Long id) {
 
 # Phase 12 — Security
 
-**Folder:** `phase-12-security/`
+**Branch:** `feature/phase-12-security` · **Work in:** [`services/`](services/)
 
 Integrate an identity provider. Do not invent your own authentication system.
 
@@ -1040,7 +1005,7 @@ Client ───────► API Gateway
 
 # Phase 13 — WebSockets & Real-Time Systems
 
-**Folder:** `phase-13-websocket/`
+**Branch:** `feature/phase-13-websocket` · **Work in:** [`services/`](services/)
 
 Dedicated phase (explicitly requested).
 
@@ -1077,7 +1042,7 @@ Customer ── WebSocket ──► Gateway ──► Order Service ──► Ka
 
 # Phase 14 — Distributed Tracing
 
-**Folder:** `phase-14-tracing/`
+**Branch:** `feature/phase-14-tracing` · **Work in:** [`services/`](services/)
 
 One request crossing many services:
 
@@ -1114,7 +1079,7 @@ Goal: answer **"Why did this particular request take 4.8 seconds?"** instead of 
 
 # Phase 15 — Centralized Logging
 
-**Folder:** `phase-15-logging/`
+**Branch:** `feature/phase-15-logging` · **Work in:** [`services/`](services/)
 
 ```
 Microservices → Structured JSON logs → Log aggregation → Search / analysis
@@ -1147,7 +1112,7 @@ Example fields: `traceId=abc123`, `spanId=xyz789`, `service=order-service`, `ope
 
 # Phase 16 — Observability
 
-**Folder:** `phase-16-observability/`
+**Branch:** `feature/phase-16-observability` · **Work in:** [`services/`](services/)
 
 Three pillars:
 
@@ -1193,7 +1158,7 @@ Three pillars:
 
 # Phase 17 — Docker & Containerization
 
-**Folder:** `phase-17-docker/`
+**Branch:** `feature/phase-17-docker` · **Work in:** [`services/`](services/)
 
 ```
                     Docker
@@ -1248,7 +1213,7 @@ docker-compose.yml
 
 # Phase 18 — Kubernetes
 
-**Folder:** `phase-18-kubernetes/`
+**Branch:** `feature/phase-18-kubernetes` · **Work in:** [`services/`](services/)
 
 Kubernetes provides service discovery and load balancing. Understand where Eureka still helps and where it is redundant.
 
@@ -1300,7 +1265,7 @@ Kubernetes provides service discovery and load balancing. Understand where Eurek
 
 # Phase 19 — Kubernetes Production Architecture
 
-**Folder:** `phase-19-kubernetes-production/`
+**Branch:** `feature/phase-19-kubernetes-production` · **Work in:** [`services/`](services/)
 
 Go beyond basic Kubernetes.
 
@@ -1336,7 +1301,7 @@ Go beyond basic Kubernetes.
 
 # Phase 20 — CI/CD
 
-**Folder:** `phase-20-cicd/`
+**Branch:** `feature/phase-20-cicd` · **Work in:** [`services/`](services/)
 
 ```
 Git Push → GitHub Actions → Build → Unit Tests → Integration Tests
@@ -1369,7 +1334,7 @@ Git Push → GitHub Actions → Build → Unit Tests → Integration Tests
 
 # Phase 21 — Testing Microservices
 
-**Folder:** `phase-21-testing/`
+**Branch:** `feature/phase-21-testing` · **Work in:** [`services/`](services/)
 
 Production systems require more than unit tests.
 
@@ -1406,7 +1371,7 @@ Unit Tests → Integration Tests → API Tests → Contract Tests
 
 # Phase 22 — Performance & Scalability
 
-**Folder:** `phase-22-performance/`
+**Branch:** `feature/phase-22-performance` · **Work in:** [`services/`](services/)
 
 Deliberately push the system. Identify what breaks first.
 
@@ -1443,7 +1408,7 @@ Deliberately push the system. Identify what breaks first.
 
 # Phase 23 — Advanced Distributed Systems
 
-**Folder:** `phase-23-distributed-systems/`
+**Branch:** `feature/phase-23-distributed-systems` · **Work in:** [`services/`](services/)
 
 Move toward senior/staff-level architecture.
 
@@ -1480,7 +1445,7 @@ Move toward senior/staff-level architecture.
 
 # Phase 24 — Production Architecture Patterns
 
-**Folder:** `phase-24-production-patterns/`
+**Branch:** `feature/phase-24-production-patterns` · **Work in:** [`services/`](services/)
 
 Implement and compare. Not every pattern belongs in every application.
 
@@ -1517,7 +1482,7 @@ Implement and compare. Not every pattern belongs in every application.
 
 # Phase 25 — Capstone: Enterprise Commerce Platform
 
-**Folder:** `capstone/`
+**Branch:** `feature/capstone` · **Folder (late):** `capstone/`
 
 One substantial production-style application. Evolve the same project through the roadmap; then consolidate reusable pieces here.
 

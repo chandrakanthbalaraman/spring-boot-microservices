@@ -32,9 +32,9 @@ Trigger: user wants a Phase N architecture infographic (e.g. “build phase 1 po
 5. **Generate locally** — use the image generation tool:
    - `filename`: `phase-{id}.png`
    - `aspect_ratio`: `16:9`
-   - `reference_image_paths`: existing `docs/phases/phase-0.png` and/or `phase-0.5.png` when present
-6. **Install** — copy/move the generated asset to `docs/phases/phase-{id}.png` (overwrite on redraw).
-7. **Verify** — confirm file exists under `docs/phases/`; open/read once if the harness supports image review; fix if status badges leaked in (regenerate once).
+   - `reference_image_paths`: existing `docs/phases/posters/phase-1.png` and/or `phase-2.png` when present
+6. **Install** — copy/move the generated asset to `docs/phases/posters/phase-{id}.png` (overwrite on redraw).
+7. **Verify** — confirm file exists under `docs/phases/posters/`; open/read once if the harness supports image review; fix if status badges leaked in (regenerate once).
 8. **Output** — path + one-line panel summary. Do not open a PR or commit unless asked.
 
 ## Out of scope

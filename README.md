@@ -2,7 +2,7 @@
 
 Hands-on learning repo: **Microservices 101 → distributed systems → production architecture → Kubernetes → capstone**.
 
-You already know Java and Spring Boot fundamentals. This repo is the engineering vehicle — one Git history, independently runnable phase folders, same services evolved instead of thrown away.
+You already know Java and Spring Boot fundamentals. This repo is the engineering vehicle — one Git history, one **`services/`** tree, phases on branches/tags, same services evolved instead of thrown away.
 
 **You implement. AI plans, scaffolds, and reviews** via [`AGENTS.md`](./AGENTS.md), [`cursor.md`](./cursor.md), and [`.claude/`](./.claude/).
 
@@ -43,7 +43,7 @@ Refresh with `/sync-phase-status` after a phase slice.
 
 ## Repository layout (target)
 
-Do **not** create all 25 phase folders up front. Start with Phase 1 only.
+One **`services/`** Maven parent (product, inventory, order). Phases are **feature branches** + **tags** — not duplicate folders. See [`sb-roadmap.md`](./sb-roadmap.md) § Git Strategy.
 
 ```text
 spring-boot-microservices/          # this repo (folder: SB-MS)
@@ -54,23 +54,22 @@ spring-boot-microservices/          # this repo (folder: SB-MS)
 ├── docs/                           architecture / decisions / notes
 ├── shared/                         common-model, common-exception, common-util (later)
 ├── infrastructure/docker/          reusable Compose (Postgres first)
-├── phase-01-microservices-basics/  product + inventory + order
-├── phase-02-…                      independently runnable snapshots
-└── capstone/                       consolidated production architecture
+├── services/                       product + inventory + order (evolves every phase)
+└── capstone/                       consolidated production architecture (late)
 ```
 
-Each phase has its **own Maven parent**. Build from the phase folder (or a service module), then run folder-by-folder:
+Build from `services/` (or a service module):
 
 ```bash
 # Refresh deps after POM changes (-U forces Maven to re-check remote metadata)
-cd phase-01-microservices-basics
+cd services
 mvn clean install -U
 
 cd product-service
 mvn spring-boot:run
 ```
 
-Same pattern for later phases, for example `phase-02-service-communication/order-service`. `clean install -U` is the command to re-run after adding a client library (RestClient factory, OpenFeign, WebClient) so the new artifacts actually land on the classpath.
+Same pattern for later phases, for example `services/order-service`. `clean install -U` is the command to re-run after adding a client library (RestClient factory, OpenFeign, WebClient) so the new artifacts actually land on the classpath.
 
 ---
 

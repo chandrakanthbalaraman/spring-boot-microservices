@@ -44,6 +44,11 @@ public class OrderExceptionHandler extends ResponseEntityExceptionHandler {
         return problem(HttpStatus.NOT_FOUND, "Product not found", ex.getMessage(), "https://example.com/problems/product-not-found", request);
     }
 
+    @ExceptionHandler(IdempotencyConflictException.class)
+    public ProblemDetail handleIdempotencyConflict(IdempotencyConflictException ex, HttpServletRequest request) {
+        return problem(HttpStatus.CONFLICT, "Idempotency conflict", ex.getMessage(), "https://example.com/problems/idempotency-conflict", request);
+    }
+
     @ExceptionHandler(RestClientException.class)
     public ProblemDetail handleRestClientException(RestClientException ex, HttpServletRequest request) {
         return problem(

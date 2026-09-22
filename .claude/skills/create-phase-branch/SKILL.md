@@ -1,7 +1,7 @@
 ---
 name: create-phase-branch
 description: >-
-  Create a feature branch from main to start the next Orbit roadmap phase. Use when the user says start phase N, create phase branch, or begin local/setup work for a phase — not for full phase scaffolding.
+  Create a feature branch from main to start the next SB-MS roadmap phase. All code changes go under `services/`. Use when the user says start phase N, create phase branch, or begin work for a phase — not for full phase scaffolding.
 role: Skill — phase branch bootstrap
 model: inherit
 color: green
@@ -21,7 +21,7 @@ Trigger: user wants to start the next roadmap phase and open a feature branch. D
 feature/phase-{N}-{short-kebab-slug}
 ```
 
-Examples: `feature/phase-0.5-local-develop-setup`, `feature/phase-1-maven-foundation`.
+Examples: `feature/phase-03-service-discovery`, `feature/phase-05-api-gateway`.
 
 ## Method
 

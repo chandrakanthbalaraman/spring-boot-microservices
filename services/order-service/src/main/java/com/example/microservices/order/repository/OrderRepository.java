@@ -18,4 +18,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items WHERE o.id = :id")
     Optional<Order> findWithItemsById(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items WHERE o.idempotencyKey = :idempotencyKey")
+    Optional<Order> findByIdempotencyKey(@Param("idempotencyKey") String idempotencyKey);
 }

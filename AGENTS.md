@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 2 — Slice D done (WebClient product GET) · E open (idempotency) · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress**
+**Phase 2 — Slice E done (Idempotency-Key on POST /orders) · pooling open · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -38,10 +38,10 @@ Update this line after every slice (e.g. `Phase 1: product-service REST + Postgr
 ## Non-negotiable constraints
 
 - Java 21, Spring Boot 3.x, Maven (not Gradle)
-- **One Git repo**, independently runnable **phase folders** — not 25 repositories
-- Each phase has its **own Maven parent**; do not force one giant reactor on day one
-- **Do not** create all 25 phase folders up front — start with Phase 1 only
-- Evolve the same services; do not throw the app away each phase
+- **One Git repo**, one runnable **`services/`** tree — phases are **branches + tags**, not duplicate folders
+- One **services** Maven parent (phases 1–24); do not force a repo-root reactor on day one
+- **Do not** copy `services/` per phase — use `feature/phase-{NN}-{slug}` and tag `phase-{NN}-complete`
+- Evolve the same services in place; do not throw the app away each phase
 - **Database-per-service** — no shared databases between services
 - Constructor injection only (`@RequiredArgsConstructor` OK) — no field `@Autowired`
 - Externalize config; **never** commit secrets
@@ -57,7 +57,7 @@ Update this line after every slice (e.g. `Phase 1: product-service REST + Postgr
 | Path | Role |
 |------|------|
 | `/sb-roadmap.md` | Phase-by-phase source of truth (checklists) |
-| `/phase-NN-*/` | Independently runnable snapshot of the system |
+| `/services/` | Runnable app (product, inventory, order) — all phases evolve here |
 | `/capstone/` | Consolidated production architecture (late) |
 | `/shared/` | Cross-service modules (`common-model`, …) when earned |
 | `/infrastructure/docker/` | Compose: Postgres first, then Redis/Kafka/obs |
@@ -209,6 +209,7 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 - Orbit-copied agents/skills may still say `com.orbit` / single-module monolith — **ignore those lines**; follow this file
 - Hexagonal / ports-and-adapters as the **default** layout — **rejected** (layer first; feature packages later if earned)
 - Gradle as app build tool — **rejected** (Maven)
+- Per-phase duplicate folders (`phase-01-*`, `phase-02-*`, …) — **superseded** by `services/` + Git branches/tags (2026-09-21)
 - Creating all 25 phase directories on day one — **rejected**
 
 ---
@@ -217,5 +218,5 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
 - [x] `.cursor/{agents,skills,commands,rules}` symlink to `.claude/` (2026-08-26)
-- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-16)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-16)
+- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-17)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-17)

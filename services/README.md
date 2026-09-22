@@ -1,8 +1,10 @@
-# Phase 02 — Inter-Service Communication
+# SB-MS — Runnable services (`services/`)
 
-Same three services as Phase 1. The lesson is **how they talk**: timeouts, pooling, Feign, error mapping, idempotency — not new business APIs.
+Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 1 snapshot: [`../phase-01-microservices-basics/`](../phase-01-microservices-basics/)
+**Current curriculum focus:** Phase 2 — inter-service communication (timeouts, Feign, WebClient, idempotency). Same three services as Phase 1; the lesson is **how they talk**, not new business APIs.
+
+Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 2 notes: [`docs/phases/phase-2/`](../docs/phases/phase-2/)
 
 ---
 
@@ -67,15 +69,15 @@ JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 1 mental model 
 ## Project Structure
 
 ```text
-phase-02-service-communication/
-├── pom.xml                 # phase Maven parent (artifact: phase-02-service-communication)
+services/
+├── pom.xml                 # phase Maven parent (artifact: services)
 ├── README.md
 ├── product-service/
 ├── inventory-service/
 └── order-service/          # RestClientConfig is the first lesson
 ```
 
-Copied from Phase 1, then evolved. Do not edit Phase 1 to “finish” Phase 2.
+Evolve in place on feature branches; merge to `main` and tag when a phase is complete.
 
 ---
 
@@ -89,7 +91,7 @@ This folder’s `pom.xml` is a Maven **parent** (`packaging: pom`). It has no `@
 # 1. Postgres (from repo root)
 cd infrastructure/docker/postgres && docker compose up -d
 
-# 2–4. One service per terminal, from this phase folder:
+# 2–4. One service per terminal, from `services/`:
 mvn spring-boot:run -pl product-service
 mvn spring-boot:run -pl inventory-service
 mvn spring-boot:run -pl order-service
@@ -123,7 +125,7 @@ inventory DOWN
 
 ## Database
 
-Same Flyway schemas. No Phase 2 migration required for timeouts/Feign. Idempotency may need `V002` on `order_db` (key store) — that is a later slice, not day one.
+Same Flyway schemas for A–D. Slice E added `V002__add_order_idempotency.sql` on `order_db` (`idempotency_key` unique + `request_fingerprint`).
 
 ---
 
@@ -138,7 +140,7 @@ Still not the focus. After timeouts exist: one test that a hung host fails insid
 1. Stop `inventory-service` → `POST /api/v1/orders` → **503** `Service Unavailable` (Slice B). Connection refused is usually faster than 500ms.
 2. Point `clients.inventory-service.base-url` at a black-hole / filtered port and confirm the request dies in ~500ms connect (or 2s if it hangs after accept), not forever.
 3. Wrong product id while inventory is **up** → still **404**, not 503.
-4. Duplicate `POST /orders` with the same `Idempotency-Key` (once Slice E exists).
+4. Duplicate `POST /orders` with the same `Idempotency-Key` → **201** + same order id, inventory reserved once. Same key + different body → **409**. Missing header → **400**.
 
 ---
 
@@ -148,10 +150,10 @@ Still not the focus. After timeouts exist: one test that a hung host fails insid
 - YAML keys do nothing until `RestClientConfig` wires a request factory.
 - Neighbor down is **503**, not a lying 500. A missing SKU stays **404**.
 - RestClient / WebClient / Feign are adapters over HTTP; the contract is still REST. Feign is Slice C.
-- Idempotency belongs on **mutating** calls the client may retry (Slice E — not done).
+- Idempotency belongs on **mutating** calls the client may retry (Slice E — `Idempotency-Key` on `POST /orders`).
 - Hard-coded URLs remain until Phase 3.
 
-Study pack: [`docs/phases/phase-2/README.md`](../docs/phases/phase-2/README.md)
+Study pack: [`docs/phases/phase-2/`](../docs/phases/phase-2/) (index) · overview: [`overview/`](../docs/phases/phase-2/overview/)
 
 ---
 
@@ -161,9 +163,9 @@ Study pack: [`docs/phases/phase-2/README.md`](../docs/phases/phase-2/README.md)
 - [x] **Slice B — error mapping:** transport → 503 ProblemDetail; unmapped HTTP → 502; domain 404/400 stay 404/409.
 - [x] **Slice C — OpenFeign inventory:** Feign on inventory (`/api/v1/inventories/{id}`, reserve, release). Timeouts + `ErrorDecoder` (404/400 → domain, else 502). Inventory down → 503.
 - [x] **Slice D — WebClient:** product GET via `ProductWebClient` + `.block()`; Feign inventory untouched. Break-it verified by learner.
-- [ ] **Slice E — idempotency:** `Idempotency-Key` header on `POST /orders`.
+- [x] **Slice E — idempotency:** `Idempotency-Key` header on `POST /orders`. Replay same body; 409 on mismatch; 400 if missing. Break-it verified.
 - [ ] Connection pooling on the request factory (explicit max connections).
-- [x] Break it after A–D. Write what you saw. Repeat after E.
+- [x] Break it after A–E. Write what you saw.
 
 ### Slice C — proven
 
@@ -173,7 +175,11 @@ Study pack: [`docs/phases/phase-2/README.md`](../docs/phases/phase-2/README.md)
 
 `WebClientConfig` (`productWebClient`) + `ProductWebClient` (`webProductClient`). Product GET uses WebClient; inventory stays Feign. App remains Tomcat (MVC + `.block()`).
 
-Learner carousel (slices first): [`docs/phases/phase-2/`](../docs/phases/phase-2/) · poster: [`docs/phases/phase-2.png`](../docs/phases/phase-2.png)
+### Slice E — proven
+
+Required `Idempotency-Key` on `POST /api/v1/orders`. `V002` unique `idempotency_key` + `request_fingerprint`. Same key+body → 201 replay, no second Feign reserve. Mismatch → 409 `Idempotency conflict`. Missing header → 400.
+
+Learner carousel (slices first): [`docs/phases/phase-2/overview/`](../docs/phases/phase-2/overview/) · interview: [`clients`](../docs/phases/phase-2/clients/) · [`openfeign`](../docs/phases/phase-2/openfeign/) · poster: [`docs/phases/posters/phase-2.png`](../docs/phases/posters/phase-2.png)
 
 ---
 

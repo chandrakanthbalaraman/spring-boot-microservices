@@ -11,13 +11,13 @@
         <relativePath/>
     </parent>
 
-    <!-- Phase-local reactor. Each later phase gets its own parent — do not fold this into a repo-root Maven reactor yet. -->
+    <!-- Single services reactor for all roadmap phases — evolve in place; use Git branches/tags per phase. -->
     <groupId>com.example.microservices</groupId>
-    <artifactId>phase-02-service-communication</artifactId>
+    <artifactId>services</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>phase-02-service-communication</name>
-    <description>Phase 02 — same three services; RestClient timeouts, WebClient, OpenFeign, idempotency</description>
+    <name>services</name>
+    <description>SB-MS — product, inventory, order (evolves phase-by-phase on branches)</description>
 
     <modules>
         <module>product-service</module>

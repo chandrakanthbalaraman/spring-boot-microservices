@@ -23,7 +23,7 @@ user-invocable: false
 - Agents: `{team}-{role}.md` under `.claude/agents/`.
 - Flyway: `V{NNN}__{snake_case_description}.sql` under each service’s `src/main/resources/db/migration/`.
 - ADRs: `NNNN-kebab-title.md` under `/docs/adr`.
-- Phase folders: `phase-{NN}-{short-kebab}/` (e.g. `phase-01-microservices-basics`).
+- Runnable code: `services/` (single Maven parent). Phase work: Git branch `feature/phase-{NN}-{short-kebab}` (e.g. `feature/phase-03-service-discovery`).
 
 ## Code (Java)
 
@@ -34,7 +34,7 @@ user-invocable: false
 
 ## Build
 
-- Maven **per phase** (parent POM in the phase folder + one module per service).
+- Maven parent in **`services/`** + one module per service (phases do not get separate POM trees).
 - Wrapper `./mvnw` inside each runnable service (or phase) once generated.
 - Do not add Gradle.
 

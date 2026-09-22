@@ -1,12 +1,12 @@
 # Phase 2 carousel v2 — Service-to-Service Communication
 
-**New pack** inspired by [`../reference/cache/`](../reference/cache/). Does **not** replace [`../phase-2/`](../phase-2/) (Slices A+B RestClient poster set).
+**New pack** inspired by [`../../reference/cache/`](../../reference/cache/). Does **not** replace [`../overview/`](../overview/) (Slices A+B RestClient poster set). Phase index: [`../`](../).
 
 Style: pastel sticky-note cheat sheets · **1:1** · LinkedIn + Instagram.
 
 Post **in filename order**. Overlay your handle in the editor (art uses `SB-MS · Phase 02` only).
 
-Source of truth: [`phase-02-service-communication/`](../../../phase-02-service-communication/) · ADRs [`0001`](../../adr/0001-restclient-timeouts-and-downstream-mapping.md), [`0002`](../../adr/0002-openfeign-inventory-only.md).
+Source of truth: [`services/`](../../../../services/) · ADRs [`0001`](../../../adr/0001-restclient-timeouts-and-downstream-mapping.md), [`0002`](../../../adr/0002-openfeign-inventory-only.md).
 
 | # | File | Page |
 |---|------|------|
@@ -23,7 +23,7 @@ Source of truth: [`phase-02-service-communication/`](../../../phase-02-service-c
 
 On-slide labels use **Retry-Safe Key** / **IDEM-KEY** because image models routinely misspell “Idempotency”. Caption and this README use the real header name `Idempotency-Key`.
 
-Skill + tokens for future topics: [`.claude/skills/generate-sysdesign-carousel/`](../../../.claude/skills/generate-sysdesign-carousel/).
+Skill + tokens for future topics: [`.claude/skills/generate-sysdesign-carousel/`](../../../../.claude/skills/generate-sysdesign-carousel/).
 
 ---
 

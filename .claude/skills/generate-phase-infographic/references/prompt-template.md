@@ -47,9 +47,9 @@ Tiny caption: "Orbit v3 · Phase {ID} architecture · see orbit-roadmap.md"
 
 When available, pass as `reference_image_paths`:
 
-- `docs/phases/phase-0.png`
-- `docs/phases/phase-0.5.png`
+- `docs/phases/posters/phase-1.png`
+- `docs/phases/posters/phase-2.png`
 
 ## Output path
 
-Save as `docs/phases/phase-{ID}.png` (use `phase-0.5.png` for Phase 0.5).
+Save as `docs/phases/posters/phase-{ID}.png` (use `phase-0.5.png` for Phase 0.5).
