@@ -8,6 +8,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record InventoryClientProperties(
     String baseUrl,
     Duration connectTimeout,
-    Duration readTimeout
+    Duration readTimeout,
+    int maxConnections,
+    int maxConnectionsPerRoute
 ) {
 }

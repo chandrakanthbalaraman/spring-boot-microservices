@@ -516,8 +516,8 @@ public interface InventoryClient {
 | **C** | OpenFeign `InventoryClient` (keep RestClient on the other neighbor) | DONE — Feign inventory; product moved to WebClient in D |
 | **D** | WebClient — one GET; blocking vs reactive | DONE — `ProductWebClient` + `WebClientConfig` (product GET); `.block()` in MVC; Feign inventory unchanged |
 | **E** | `Idempotency-Key` on `POST /api/v1/orders` | DONE — required header; `V002` unique key + fingerprint; replay same body; 409 on mismatch |
-| **+** | Explicit connection **pooling** on the request factory | [ ] |
-| **Break** | After each slice: stop a neighbor, POST an order, write what you saw | DONE for A–E |
+| **+** | Explicit connection **pooling** on the live clients | DONE — Feign inventory: HC5 `PoolingHttpClientConnectionManager` in `InventoryFeignConfig`; product: Reactor `ConnectionProvider` in `WebClientConfig`; YAML `max-connections` |
+| **Break** | After each slice: stop a neighbor, POST an order, write what you saw | DONE for A–E + pooling (inventory down → 503) |
 
 ### Learn
 
@@ -525,7 +525,7 @@ public interface InventoryClient {
 - [x] WebClient (`ProductWebClient` + `WebClientConfig`; product GET with `.block()`)
 - [x] OpenFeign (`InventoryFeignApi` + `InventoryErrorDecoder`; inventory reserve/release)
 - [x] HTTP timeouts (connect 500ms, read 2s, wired in `RestClientConfig`)
-- [ ] Connection pooling (explicit sizing — `detect()` is not a pool policy)
+- [x] Connection pooling (Feign HC5 max total/per-route; WebClient `ConnectionProvider.maxConnections`; not RestClient `detect()`)
 - [x] Serialization / deserialization (Jackson `body(...)` on RestClient — inherited)
 - [x] Error handling (typed downstream exceptions + ProblemDetail 503/500/404/409)
 - [x] API versioning (`/api/v1/...` inherited; not changed this phase)
@@ -537,13 +537,13 @@ public interface InventoryClient {
 
 - [x] Replace ad-hoc REST calls with RestClient (WebClient now on product GET)
 - [x] Implement OpenFeign `InventoryClient` (Feign on inventory)
-- [x] Configure timeouts (`timeoutFactory` + YAML; WebClient via Reactor Netty `HttpClient`). Pooling still open.
+- [x] Configure timeouts (`timeoutFactory` + YAML; WebClient via Reactor Netty `HttpClient`) + explicit pools on live clients
 - [x] Handle client errors without leaking internals (503/502 ProblemDetail, named service, no stack)
 - [x] Version APIs (inherited `/api/v1`)
 - [x] Make mutating calls idempotent where needed (`Idempotency-Key` on create order)
 - [x] Move beyond simple REST calls (prepare for discovery) — Feign `name` is the future Eureka id; `url` still localhost
 
-**Next slice in this phase:** explicit connection pooling. **Next phase after pooling:** remove hard-coded service URLs (Phase 03). Open branch `feature/phase-03-service-discovery` — same `services/` tree.
+**Phase 02 slices complete.** **Next:** Phase 03 — Service Discovery. Open `feature/phase-03-service-discovery` and evolve the same [`services/`](services/) tree — replace `localhost` URLs with logical names (Eureka as teaching tool). Do not create a new phase folder.
 
 ---
 

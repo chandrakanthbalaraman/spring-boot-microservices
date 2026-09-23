@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public record ProductClientProperties(
     String baseUrl,
     Duration connectTimeout,
-    Duration readTimeout
+    Duration readTimeout,
+    int maxConnections
 ) {
 }

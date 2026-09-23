@@ -37,10 +37,18 @@ clients:
     base-url: http://localhost:8081
     connect-timeout: 500ms
     read-timeout: 2s
+    max-connections: 50
 
   inventory-service:
     # Feign @FeignClient url + Request.Options both read this block. No Eureka yet.
     base-url: http://localhost:8082
     connect-timeout: 500ms
     read-timeout: 2s
-  
+    max-connections: 50
+    max-connections-per-route: 20
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      prefer-ip-address: true

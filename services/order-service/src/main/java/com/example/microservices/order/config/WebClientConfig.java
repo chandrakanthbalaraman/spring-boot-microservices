@@ -7,6 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import io.netty.channel.ChannelOption;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 @Configuration
 public class WebClientConfig {
@@ -17,7 +18,13 @@ public class WebClientConfig {
      */
     @Bean(name = "productWebClient")
     public WebClient productWebClient(ProductClientProperties properties) {
-        HttpClient httpClient = HttpClient.create()
+
+        ConnectionProvider connectionProvider = ConnectionProvider.builder("product-service")
+                .maxConnections(properties.maxConnections())
+                .pendingAcquireTimeout(properties.connectTimeout())
+                .build();
+
+        HttpClient httpClient = HttpClient.create(connectionProvider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS,
                         (int) properties.connectTimeout().toMillis())
                 .responseTimeout(properties.readTimeout());
