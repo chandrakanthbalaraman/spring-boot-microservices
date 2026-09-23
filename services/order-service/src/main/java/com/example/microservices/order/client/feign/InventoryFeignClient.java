@@ -1,6 +1,5 @@
 package com.example.microservices.order.client.feign;
 
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import com.example.microservices.order.client.InventoryClient;
@@ -11,12 +10,10 @@ import feign.RetryableException;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Slice C adapter: OrderServiceImpl keeps depending on {@link InventoryClient}.
- * {@code @Primary} wins over {@code RestInventoryClient} while that RestClient
- * implementation stays on the classpath as the comparison artifact.
+ * OrderServiceImpl depends on {@link InventoryClient}. This adapter delegates
+ * to the Eureka-backed Feign API.
  */
 @Component
-@Primary
 @RequiredArgsConstructor
 public class InventoryFeignClient implements InventoryClient {
 

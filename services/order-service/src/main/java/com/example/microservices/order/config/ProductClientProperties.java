@@ -9,6 +9,7 @@ public record ProductClientProperties(
     String baseUrl,
     Duration connectTimeout,
     Duration readTimeout,
-    int maxConnections
+    int maxConnections,
+    int maxConnectionsPerRoute
 ) {
 }

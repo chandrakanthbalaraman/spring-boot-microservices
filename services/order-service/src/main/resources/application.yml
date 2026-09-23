@@ -29,26 +29,30 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
-    # Slice C: Feign BASIC logs method + URL + status. Product RestClient is unchanged.
-    com.example.microservices.order.client.feign.InventoryFeignApi: DEBUG
+    com.example.microservices.order.client.feign: DEBUG
 
+# Feign resolves product-service and inventory-service through Eureka.
+# base-url is only the leftover RestClient beans; those need an absolute URL.
 clients:
   product-service:
     base-url: http://localhost:8081
     connect-timeout: 500ms
     read-timeout: 2s
     max-connections: 50
+    max-connections-per-route: 20
 
   inventory-service:
-    # Feign @FeignClient url + Request.Options both read this block. No Eureka yet.
     base-url: http://localhost:8082
     connect-timeout: 500ms
     read-timeout: 2s
     max-connections: 50
     max-connections-per-route: 20
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-    instance:
-      prefer-ip-address: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    # Local same-machine: advertise localhost, not the LAN IP.
+    hostname: localhost
+    prefer-ip-address: false

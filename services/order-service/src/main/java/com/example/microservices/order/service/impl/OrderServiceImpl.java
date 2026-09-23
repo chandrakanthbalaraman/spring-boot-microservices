@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.example.microservices.order.client.InventoryClient;
 import com.example.microservices.order.client.ProductClient;
 import com.example.microservices.order.client.dto.ProductResponse;
-import com.example.microservices.order.client.webclient.ProductWebClient;
 import com.example.microservices.order.dto.OrderCreateRequest;
 import com.example.microservices.order.dto.OrderItemRequest;
 import com.example.microservices.order.mapper.OrderMapper;
@@ -33,7 +32,7 @@ import com.example.microservices.order.exception.OrderNotFoundException;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
-    private final ProductWebClient productWebClient;
+    private final ProductClient productClient;
 
     @Override
     public OrderResponse createOrder(OrderCreateRequest request, String idempotencyKey) {
@@ -64,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
 
         try {
             for (OrderItemRequest itemRequest : request.getItems()) {
-                ProductResponse product = productWebClient.getProductByProductId(itemRequest.getProductId());
+                ProductResponse product = productClient.getProductByProductId(itemRequest.getProductId());
                 inventoryClient.reserveStockByProductId(itemRequest.getProductId(), itemRequest.getQuantity());
                 processedItems.add(itemRequest);
                 order.addItem(

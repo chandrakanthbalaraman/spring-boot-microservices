@@ -36,6 +36,7 @@ Orbit entries below are **historical copies from the toolkit scaffold**. They do
 - 2026-09-17 | — | Slice D: product GET moved to WebClient (`ProductWebClient` + `.block()`); Feign remains on inventory. ADR-0002 inventory decision unchanged.
 - 2026-09-17 | — | Slice E: `Idempotency-Key` required on `POST /api/v1/orders`; unique key + payload fingerprint in `order_db` (`V002`). Same key+body replays; mismatch → 409. Not Redis (Phase 11).
 - 2026-09-22 | — | Slice +: live-path pooling only — Feign inventory Apache HC5 (`maxConnections` / `maxConnectionsPerRoute`); product WebClient Reactor `ConnectionProvider`. RestClient leftover beans not required.
+- 2026-09-23 | — | Phase 3 live path: both order-service neighbors are OpenFeign. `@FeignClient(name)` is the Eureka id (no `url`). Product WebClient retired. Supersedes the Slice D "product stays WebClient" line.
 - 2026-08-25 | — | GitHub repo `chandrakanthbalaraman/spring-boot-microservices`. Trello board https://trello.com/b/Cjb5ESUA/sb-ms-spring-boot-microservices in workspace “chandrakanth balaraman's Projects” (MCP cannot create a new Trello org). Card map: `docs/trello.md`. Trello is an optional mirror.
 
 ## Entries (Orbit scaffold — do not apply)

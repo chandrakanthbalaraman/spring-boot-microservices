@@ -35,4 +35,6 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
   instance:
-    prefer-ip-address: true
+    # Local same-machine: advertise localhost, not the LAN IP.
+    hostname: localhost
+    prefer-ip-address: false

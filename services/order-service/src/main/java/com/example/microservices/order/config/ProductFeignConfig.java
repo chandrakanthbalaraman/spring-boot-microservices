@@ -11,7 +11,7 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 
-import com.example.microservices.order.client.feign.InventoryErrorDecoder;
+import com.example.microservices.order.client.feign.ProductErrorDecoder;
 
 import feign.Client;
 import feign.Logger;
@@ -20,19 +20,15 @@ import feign.codec.ErrorDecoder;
 import feign.hc5.ApacheHttp5Client;
 
 /**
- * Per-client Feign overrides. Not {@code @Configuration} on purpose: a component-scanned
- * {@code @Configuration} listed on {@code @FeignClient(configuration=...)} becomes global
- * for every Feign client. Spring Cloud instantiates this class in the inventory-service
- * child context instead.
+ * Per-client Feign overrides for product-service. Not {@code @Configuration}:
+ * a scanned configuration class on {@code @FeignClient(configuration=...)}
+ * would apply to every Feign client. Spring Cloud builds a child context
+ * for this class alone.
  */
-public class InventoryFeignConfig {
+public class ProductFeignConfig {
 
-    /**
-     * Same 500ms / 2s budget as {@code inventoryRestClient}. One YAML source
-     * ({@link InventoryClientProperties}); Feign does not get a second millisecond copy.
-     */
     @Bean
-    public Request.Options inventoryFeignOptions(InventoryClientProperties properties) {
+    public Request.Options productFeignOptions(ProductClientProperties properties) {
         return new Request.Options(
                 properties.connectTimeout().toMillis(), TimeUnit.MILLISECONDS,
                 properties.readTimeout().toMillis(), TimeUnit.MILLISECONDS,
@@ -42,13 +38,12 @@ public class InventoryFeignConfig {
     /**
      * Apache HC5 keeps the per-service pool. Wrapping it in
      * {@link FeignBlockingLoadBalancerClient} is what turns
-     * {@code inventory-service} into a Eureka lookup. A bare {@link ApacheHttp5Client}
+     * {@code product-service} into a Eureka lookup. A bare {@link ApacheHttp5Client}
      * would treat that name as a DNS host.
-     * {@code disableAutomaticRetries()} — retries are Phase 7; POST + retry can double-reserve.
      */
     @Bean
-    public Client inventoryFeignClient(
-            InventoryClientProperties properties,
+    public Client productFeignHttpClient(
+            ProductClientProperties properties,
             LoadBalancerClient loadBalancerClient,
             LoadBalancerClientFactory loadBalancerClientFactory) {
         PoolingHttpClientConnectionManager connectionManager =
@@ -69,12 +64,12 @@ public class InventoryFeignConfig {
     }
 
     @Bean
-    public ErrorDecoder inventoryErrorDecoder() {
-        return new InventoryErrorDecoder();
+    public ErrorDecoder productErrorDecoder() {
+        return new ProductErrorDecoder();
     }
 
     @Bean
-    public Logger.Level inventoryFeignLoggerLevel() {
+    public Logger.Level productFeignLoggerLevel() {
         return Logger.Level.BASIC;
     }
 }

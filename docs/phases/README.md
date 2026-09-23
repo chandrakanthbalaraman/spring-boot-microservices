@@ -54,7 +54,6 @@ docs/phases/phase-{N}/{topic}/
 | [`phase-2/clients/`](./phase-2/clients/) | 2 | RestClient vs OpenFeign vs WebClient | **api-gateway** | shipped |
 | [`phase-2/openfeign/`](./phase-2/openfeign/) | 2 | OpenFeign deep dive | **api-gateway** | shipped |
 | [`phase-2/restclient/`](./phase-2/restclient/) | 2 | RestClient factory + `onStatus` / `execute()` | api-gateway | **planned** — stub |
-| [`phase-2/webclient/`](./phase-2/webclient/) | 2 | WebClient + Reactor Netty + `.block()` in MVC | api-gateway | **planned** — stub |
 | [`phase-3/discovery/`](./phase-3/discovery/) | 3 | Eureka teaching tool vs K8s DNS | **api-gateway** | shipped pack · phase folder planned |
 
 ## Style families

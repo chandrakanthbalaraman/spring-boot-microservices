@@ -10,15 +10,12 @@ import com.example.microservices.order.client.dto.InventoryResponse;
 import com.example.microservices.order.config.InventoryFeignConfig;
 
 /**
- * Slice C — declarative inventory client. Product stays on RestClient.
- * {@code url} is still localhost until Phase 3; {@code name} is the future Eureka id.
+ * Declarative inventory client. No {@code url}: {@code name} is the Eureka
+ * application id, resolved by Spring Cloud LoadBalancer.
  *
  * <p>Timeouts and the error decoder live in {@link InventoryFeignConfig}, not on this interface.
  */
-@FeignClient(
-        name = "inventory-service",
-        url = "${clients.inventory-service.base-url}",
-        configuration = InventoryFeignConfig.class)
+@FeignClient(name = "inventory-service", configuration = InventoryFeignConfig.class)
 public interface InventoryFeignApi {
     
     @GetMapping("/api/v1/inventories/{productId}")
