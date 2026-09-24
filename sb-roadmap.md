@@ -115,9 +115,9 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | # | Phase | Branch / tag | Status |
 |---|-------|--------------|--------|
 | 01 | Microservices Architecture Fundamentals | tag `phase-01-complete` | DONE (tests N/A) |
-| 02 | Inter-Service Communication | `feature/phase-02-*` → `main` | PARTIAL (A+B done; C Feign scaffolded; D–E open) |
-| 03 | Service Discovery | `feature/phase-03-service-discovery` | [ ] |
-| 04 | Load Balancing | `feature/phase-04-load-balancing` | [ ] |
+| 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
+| 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
+| 04 | Load Balancing | `feature/phase-04-load-balancing` | MISSING (next) |
 | 05 | API Gateway | `feature/phase-05-api-gateway` | [ ] |
 | 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
@@ -578,23 +578,23 @@ Order → inventory-service → instance 1 / instance 2 / instance 3
 | **B** | Register product, inventory, and order services | DONE — three registrations verified by learner |
 | **C** | Resolve both order-service neighbors by logical Feign name | DONE — name-only Feign order flow verified by learner |
 | **D** | Observe metadata and break discovery deliberately | DONE — runtime exercise verified by learner |
-| **E** | Compare Eureka with Kubernetes Service DNS | MISSING — next learner slice |
+| **E** | Compare Eureka with Kubernetes Service DNS | N/A (intentional) — deferred to Phase 18 when real Kubernetes Services and DNS exist |
 
-**Current evidence:** `mvn test` is green for all four modules; the learner confirmed the registry, registration, name-based order flow, and break-it exercise on 2026-09-23.
+**Current evidence:** `mvn test` is green for all four modules (reverified 2026-09-23); the learner confirmed the registry, registration, name-based order flow, metadata, and break-it exercise. Merged to `main` and tagged `phase-03-complete`.
 
 ### Learn
 
 - [x] Service registry
 - [x] Service discovery
 - [x] Client-side discovery
-- [ ] Server-side discovery
+- [ ] Server-side discovery — deferred to Phase 18, where Kubernetes Service routing makes it concrete
 - [x] Service registration
 - [x] Health checks
 - [x] Instance metadata
 - [x] Load-balanced service calls
 - [x] Spring Cloud LoadBalancer
 - [x] Eureka
-- [ ] Alternatives and when discovery is unnecessary in Kubernetes
+- [ ] Alternatives and when discovery is unnecessary in Kubernetes — deferred to Phase 18
 
 ### Hands-on
 
@@ -602,11 +602,11 @@ Order → inventory-service → instance 1 / instance 2 / instance 3
 - [x] Register product, inventory, and order services
 - [x] Call services by name, not host/port
 - [x] Confirm health and instance metadata in the registry
-- [ ] Compare Eureka vs Kubernetes DNS/Services (do not over-invest in Eureka)
+- [ ] Compare Eureka vs Kubernetes DNS/Services — deferred to Phase 18 (do not teach it without a real cluster)
 
-**Next slice:** E — distinguish Eureka client-side discovery from Kubernetes Service DNS and test what happens when only the discovery control plane stops.
+**Phase 03 release checkpoint:** merged to `main` and tagged `phase-03-complete`. The Kubernetes comparison stays open under Phase 18.
 
-**Next:** Scale instances and distribute traffic.
+**Next learning slice:** Phase 04 Slice A — run multiple stateless inventory-service instances on distinct ports and inspect their Eureka registrations before measuring traffic distribution.
 
 ---
 
@@ -641,10 +641,12 @@ Scale services. Keep them stateless.
 
 ### Hands-on
 
-- [ ] Run `inventory-service` on `:8081`, `:8082`, `:8083`
+- [ ] Run multiple `inventory-service` instances on distinct non-conflicting ports (for example `:8091`, `:8092`, `:8093`)
 - [ ] Demonstrate traffic distribution
 - [ ] Prove unhealthy instances are skipped
 - [ ] Confirm services stay stateless under scale
+
+**Next slice:** A — launch two inventory-service instances with unique instance metadata, confirm both register in Eureka, and keep product/order ports unchanged.
 
 **Next:** Introduce a single real entry point.
 
@@ -1271,7 +1273,7 @@ Kubernetes provides service discovery and load balancing. Understand where Eurek
 - [ ] Deploy gateway + core services
 - [ ] ConfigMaps, Secrets, probes, requests/limits
 - [ ] Ingress to the gateway
-- [ ] Contrast Eureka vs Kubernetes Services
+- [ ] Complete the deferred Phase 03 comparison: contrast Eureka client-side discovery with Kubernetes Service DNS, ClusterIP routing, and EndpointSlices
 
 **Next:** Production Kubernetes practices.
 

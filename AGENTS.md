@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 03 — Eureka server/client wiring + name-based Feign + runtime discovery verified · next Slice E: Eureka vs Kubernetes Service DNS · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress (close when you merge/tag)**
+**Phase 03 DONE — tag `phase-03-complete` · Slices A–D verified; Slice E deferred to Phase 18 · next Phase 04 Slice A (multiple stateless inventory instances) · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress (close the card; code is on `main`)**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

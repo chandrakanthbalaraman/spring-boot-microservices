@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 3 — service discovery. Eureka registration, name-based Feign calls, metadata, and the neighbor break-it are verified; the remaining topic is Eureka versus Kubernetes Service DNS.
+**Current curriculum focus:** Phase 3 is merged and tagged `phase-03-complete`. Eureka registration, name-based Feign calls, metadata, and the neighbor break-it are verified. The Kubernetes comparison is deferred to Phase 18. Next is Phase 04 load balancing.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 3 notes: [`docs/phases/phase-3/`](../docs/phases/phase-3/)
 
@@ -138,7 +138,7 @@ Discovery adds no database changes. The three business services keep their exist
 
 ## Testing
 
-`mvn test` currently proves all four modules compile; there are no substantive automated tests yet. Phase 3 completion therefore requires runtime evidence from the dashboard and an end-to-end order request.
+`mvn test` proves all four modules compile; there are no substantive automated tests yet. The learner has supplied the required Phase 3 runtime evidence from the dashboard, end-to-end order path, metadata inspection, and break-it exercise.
 
 ---
 
@@ -169,7 +169,7 @@ Study pack: [`docs/phases/phase-3/discovery/`](../docs/phases/phase-3/discovery/
 - [x] **Slice B proof — registration:** start all three business services; record their application ids and instance metadata.
 - [x] **Slice C proof — name-based calls:** create an order and confirm product/inventory Feign logs use discovered instances.
 - [x] **Slice D — break discovery:** stop one neighbor, observe eviction/failure, then recover it.
-- [ ] **Slice E — compare:** explain when Eureka is redundant behind Kubernetes Services.
+- [x] **Slice E scope decision — N/A (intentional):** defer Eureka vs Kubernetes Services until Phase 18, when the comparison can use a real cluster.
 
 ---
 
@@ -181,4 +181,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 04 — Load Balancing**, after Phase 3 runtime evidence is complete and the branch is reviewed/merged/tagged.
+**Phase 04 — Load Balancing.** Next learning slice: run multiple stateless inventory-service instances on distinct ports and inspect their Eureka registrations.
