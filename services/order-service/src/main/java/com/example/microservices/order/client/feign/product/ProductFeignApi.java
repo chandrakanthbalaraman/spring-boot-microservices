@@ -1,11 +1,10 @@
-package com.example.microservices.order.client.feign;
+package com.example.microservices.order.client.feign.product;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.microservices.order.client.dto.ProductResponse;
-import com.example.microservices.order.config.ProductFeignConfig;
 
 /**
  * Declarative product client. No {@code url}: {@code name} is the Eureka

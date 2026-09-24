@@ -2,49 +2,47 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 2 — inter-service communication (timeouts, Feign, WebClient, idempotency). Same three services as Phase 1; the lesson is **how they talk**, not new business APIs.
+**Current curriculum focus:** Phase 3 — service discovery. Eureka registration, name-based Feign calls, metadata, and the neighbor break-it are verified; the remaining topic is Eureka versus Kubernetes Service DNS.
 
-Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 2 notes: [`docs/phases/phase-2/`](../docs/phases/phase-2/)
+Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 3 notes: [`docs/phases/phase-3/`](../docs/phases/phase-3/)
 
 ---
 
 ## Objective
 
-Phase 1 proved failure **propagates**. Phase 2 makes the HTTP client **deliberate**:
+Phase 2 made HTTP clients deliberate. Phase 3 removes physical neighbor addresses from the live order path:
 
-- Fail fast (connect + read timeout) instead of hanging
-- Map “neighbor down” to **503**, not a generic 500
-- Compare **RestClient**, **WebClient**, and **OpenFeign** on the same inventory call
-- Idempotent `POST /orders` so a retry does not double-reserve stock
+- Run a standalone Eureka registry on `:8761`
+- Register product, inventory, and order under `spring.application.name`
+- Resolve `product-service` and `inventory-service` through name-only Feign clients
+- Observe registration, heartbeat, and instance metadata before changing more code
+- Preserve Phase 2 timeout, pooling, error mapping, and idempotency behavior
 
-Do **not** throw this folder away in Phase 3. Discovery replaces `localhost` URLs; the clients stay.
+Eureka is a teaching tool here. Kubernetes Service DNS replaces this mechanism in the later Kubernetes phases.
 
 ---
 
 ## Architecture
 
 ```
-                 Client
-                    │
-                    ▼
-              order-service :8083
-                 /          \
-    RestClient  /            \  OpenFeign (Slice C)
-     (+ timeout)              \ (+ timeout + ErrorDecoder)
-               ▼               ▼
-     product-service     inventory-service
-          :8081               :8082
+                       discovery-server :8761
+                         registry / lookup
+                        /        |        \
+                       v         v         v
+              product-service inventory-service order-service
+                    ^               ^               :8083
+                     \             /
+                      name-only Feign
 ```
 
-| Still true from Phase 1 | New in Phase 2 |
-|-------------------------|----------------|
-| 3 processes, 3 Postgres | Client timeouts + pool |
-| `POST /api/v1/orders` orchestration | **503** for dependency down (timeout / refused) |
-| Hard-coded `localhost` URLs | Feign `InventoryClient` (then Phase 3 removes the host) |
-| Manual compensation | `Idempotency-Key` on create order |
-| RestClient exists, no timeout | WebClient on one path (compare blocking vs reactive) |
+| Preserved from Phase 2 | New in Phase 3 |
+|------------------------|----------------|
+| Feign timeouts + HC5 pools | Eureka registry and clients |
+| Typed downstream errors | Logical service names instead of Feign URLs |
+| `Idempotency-Key` on create order | Registration, heartbeat, and instance metadata |
+| Manual compensation | Client-side discovery via Spring Cloud LoadBalancer |
 
-Out of scope here: Eureka, Gateway, Resilience4j circuit breaker (Phases 3 / 5 / 7).
+Out of scope here: multiple-instance traffic distribution, Gateway, and Resilience4j (Phases 4 / 5 / 7).
 
 ---
 
@@ -54,6 +52,7 @@ Unchanged ports and DBs. Run Compose from `infrastructure/docker/postgres` (same
 
 | Service | Port | DB |
 |---------|------|-----|
+| `discovery-server` | 8761 | none |
 | `product-service` | 8081 | `product_db` :5433 |
 | `inventory-service` | 8082 | `inventory_db` :5434 |
 | `order-service` | 8083 | `order_db` :5435 |
@@ -62,7 +61,7 @@ Unchanged ports and DBs. Run Compose from `infrastructure/docker/postgres` (same
 
 ## Prerequisites
 
-JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 1 mental model (you already ran the break-it).
+JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 2 timeout/error/idempotency behavior.
 
 ---
 
@@ -72,9 +71,10 @@ JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 1 mental model 
 services/
 ├── pom.xml                 # phase Maven parent (artifact: services)
 ├── README.md
+├── discovery-server/       # Eureka registry; no database
 ├── product-service/
 ├── inventory-service/
-└── order-service/          # RestClientConfig is the first lesson
+└── order-service/          # name-only Feign clients resolve through Eureka
 ```
 
 Evolve in place on feature branches; merge to `main` and tag when a phase is complete.
@@ -83,7 +83,7 @@ Evolve in place on feature branches; merge to `main` and tag when a phase is com
 
 ## How to Run
 
-Start databases once, then **three terminals** (order-service needs the other two).
+Start databases once, then use **four terminals**. Start Eureka first, then the three business services.
 
 This folder’s `pom.xml` is a Maven **parent** (`packaging: pom`). It has no `@SpringBootApplication`. Running `mvn spring-boot:run` here fails with *Unable to find a suitable main class*. Pick a child module.
 
@@ -91,13 +91,18 @@ This folder’s `pom.xml` is a Maven **parent** (`packaging: pom`). It has no `@
 # 1. Postgres (from repo root)
 cd infrastructure/docker/postgres && docker compose up -d
 
-# 2–4. One service per terminal, from `services/`:
+# 2. Registry first, from `services/`:
+mvn spring-boot:run -pl discovery-server
+
+# 3–5. One business service per terminal, from `services/`:
 mvn spring-boot:run -pl product-service
 mvn spring-boot:run -pl inventory-service
 mvn spring-boot:run -pl order-service
 ```
 
-Same idea as Phase 1 if you prefer to `cd` into the service first:
+Open http://localhost:8761 and wait until all three application names appear before testing the order flow.
+
+The same module commands work if you prefer to `cd` into a child service first:
 
 ```bash
 cd product-service && mvn spring-boot:run
@@ -107,88 +112,73 @@ cd product-service && mvn spring-boot:run
 
 ## API Endpoints
 
-Same `/api/v1/...` contracts as Phase 1 until the idempotency slice.
+The `/api/v1/...` contracts and required `Idempotency-Key` from Phase 2 are unchanged.
 
 ---
 
 ## Request Flow
 
-Unchanged happy path. What changes is **failure timing and status** once Slices A + B are wired:
+The business contract is unchanged; only endpoint resolution changes:
 
 ```
-inventory DOWN
-  Phase 1: connection refused (fast) OR hang (no timeout) → often HTTP 500
-  Phase 2 A+B: connect/read timeout → 503 ProblemDetail (named service, no stack)
+POST /api/v1/orders
+  → Feign asks LoadBalancer for product-service
+  → LoadBalancer uses the Eureka registry to select an instance
+  → Feign asks LoadBalancer for inventory-service
+  → order is created with the existing idempotency behavior
 ```
 
 ---
 
 ## Database
 
-Same Flyway schemas for A–D. Slice E added `V002__add_order_idempotency.sql` on `order_db` (`idempotency_key` unique + `request_fingerprint`).
+Discovery adds no database changes. The three business services keep their existing database-per-service Flyway schemas.
 
 ---
 
 ## Testing
 
-Still not the focus. After timeouts exist: one test that a hung host fails inside the read-timeout budget (MockWebServer / WireMock). Authz N/A.
+`mvn test` currently proves all four modules compile; there are no substantive automated tests yet. Phase 3 completion therefore requires runtime evidence from the dashboard and an end-to-end order request.
 
 ---
 
 ## Failure Scenarios
 
-1. Stop `inventory-service` → `POST /api/v1/orders` → **503** `Service Unavailable` (Slice B). Connection refused is usually faster than 500ms.
-2. Point `clients.inventory-service.base-url` at a black-hole / filtered port and confirm the request dies in ~500ms connect (or 2s if it hangs after accept), not forever.
-3. Wrong product id while inventory is **up** → still **404**, not 503.
-4. Duplicate `POST /orders` with the same `Idempotency-Key` → **201** + same order id, inventory reserved once. Same key + different body → **409**. Missing header → **400**.
+1. Start order-service before Eureka and observe registration/lookup behavior; then start Eureka and watch recovery.
+2. With all services registered, stop `inventory-service`; repeat `POST /api/v1/orders` immediately, then observe how long the stale registration remains visible.
+3. Confirm the caller gets the existing typed **503**, not a raw `No servers available` message or an indefinite hang.
+4. Restart inventory-service and observe it re-register before repeating the happy path.
 
 ---
 
-## What We Learned (Slices A + B)
+## Current lesson
 
-- Timeout is a **product decision**, not a JVM default. Connect 500ms vs read 2s catch different failures.
-- YAML keys do nothing until `RestClientConfig` wires a request factory.
-- Neighbor down is **503**, not a lying 500. A missing SKU stays **404**.
-- RestClient / WebClient / Feign are adapters over HTTP; the contract is still REST. Feign is Slice C.
-- Idempotency belongs on **mutating** calls the client may retry (Slice E — `Idempotency-Key` on `POST /orders`).
-- Hard-coded URLs remain until Phase 3.
+- A registry maps a logical service id to one or more physical instances.
+- A Eureka client both registers itself and fetches registry data.
+- `@FeignClient(name = "inventory-service")` becomes a discovery lookup only when no fixed `url` overrides it.
+- Discovery finds an instance; it does not replace timeout, pooling, error mapping, idempotency, or resilience.
 
-Study pack: [`docs/phases/phase-2/`](../docs/phases/phase-2/) (index) · overview: [`overview/`](../docs/phases/phase-2/overview/)
+Study pack: [`docs/phases/phase-3/discovery/`](../docs/phases/phase-3/discovery/)
 
 ---
 
 ## Exercises (do in order — do not dump the phase)
 
-- [x] **Slice A — RestClient timeouts:** `timeoutFactory` in `order-service` `RestClientConfig` using `clients.*.connect-timeout` / `read-timeout`. Re-run the inventory-down experiment.
-- [x] **Slice B — error mapping:** transport → 503 ProblemDetail; unmapped HTTP → 502; domain 404/400 stay 404/409.
-- [x] **Slice C — OpenFeign inventory:** Feign on inventory (`/api/v1/inventories/{id}`, reserve, release). Timeouts + `ErrorDecoder` (404/400 → domain, else 502). Inventory down → 503.
-- [x] **Slice D — WebClient:** product GET via `ProductWebClient` + `.block()`; Feign inventory untouched. Break-it verified by learner.
-- [x] **Slice E — idempotency:** `Idempotency-Key` header on `POST /orders`. Replay same body; 409 on mismatch; 400 if missing. Break-it verified.
-- [ ] Connection pooling on the request factory (explicit max connections).
-- [x] Break it after A–E. Write what you saw.
-
-### Slice C — proven
-
-`InventoryFeignApi` + `InventoryErrorDecoder` + `@Primary` adapter. Inventory via Feign; product moved to WebClient in Slice D. `url` is still `http://localhost:8082` until Phase 3.
-
-### Slice D — proven
-
-`WebClientConfig` (`productWebClient`) + `ProductWebClient` (`webProductClient`). Product GET uses WebClient; inventory stays Feign. App remains Tomcat (MVC + `.block()`).
-
-### Slice E — proven
-
-Required `Idempotency-Key` on `POST /api/v1/orders`. `V002` unique `idempotency_key` + `request_fingerprint`. Same key+body → 201 replay, no second Feign reserve. Mismatch → 409 `Idempotency conflict`. Missing header → 400.
-
-Learner carousel (slices first): [`docs/phases/phase-2/overview/`](../docs/phases/phase-2/overview/) · interview: [`clients`](../docs/phases/phase-2/clients/) · [`openfeign`](../docs/phases/phase-2/openfeign/) · poster: [`docs/phases/posters/phase-2.png`](../docs/phases/posters/phase-2.png)
+- [x] **Slice A code — Eureka server:** module, server dependency, `@EnableEurekaServer`, standalone client settings.
+- [x] **Slice A proof:** start `discovery-server`; inspect the empty dashboard.
+- [x] **Slice B proof — registration:** start all three business services; record their application ids and instance metadata.
+- [x] **Slice C proof — name-based calls:** create an order and confirm product/inventory Feign logs use discovered instances.
+- [x] **Slice D — break discovery:** stop one neighbor, observe eviction/failure, then recover it.
+- [ ] **Slice E — compare:** explain when Eureka is redundant behind Kubernetes Services.
 
 ---
 
 ## Production Improvements
 
-Discovery (Phase 3) · load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Kafka (10).
+Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Kafka (10).
 
 ---
 
 ## Next Phase
 
-**Phase 03 — Service Discovery.** Replace `http://localhost:8082` with the logical name `inventory-service`.
+**Phase 04 — Load Balancing**, after Phase 3 runtime evidence is complete and the branch is reviewed/merged/tagged.

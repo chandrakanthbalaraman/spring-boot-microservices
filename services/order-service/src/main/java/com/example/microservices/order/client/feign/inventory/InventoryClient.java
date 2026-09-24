@@ -1,4 +1,4 @@
-package com.example.microservices.order.client;
+package com.example.microservices.order.client.feign.inventory;
 
 import com.example.microservices.order.client.dto.InventoryResponse;
 

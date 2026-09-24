@@ -1,10 +1,10 @@
 # Phase 3 — Service Discovery
 
-Interview-dense **api-gateway notebook** pack for the **planned** phase. There is **no** `phase-03-service-discovery/` runnable folder yet — content is locked to [`sb-roadmap.md`](../../../../sb-roadmap.md) Phase 03 (do not invent APIs or ports).
+Interview-dense **api-gateway notebook** pack for the active phase. Runnable code evolves in the shared [`services/`](../../../../services/) tree on `feature/phase-03-service-discovery`; phases are branches and tags, not duplicate folders.
 
 Style: [`../../reference/api-gateway/`](../../reference/api-gateway/) · 1:1 · footer `SB-MS · Phase 03`.
 
-**Bridge from Phase 2:** Feign already has `name = "inventory-service"` and `url = localhost:8082`. This phase **drops `url`** so the name resolves via a registry.
+**Bridge from Phase 2:** Both live order-service neighbors now use name-only Feign clients. Eureka plus Spring Cloud LoadBalancer resolves `product-service` and `inventory-service`; runtime proof is the remaining lesson.
 
 Eureka is a **teaching** discovery tool. Kubernetes Service DNS supersedes it later — say that on slides 08–10, do not over-invest.
 

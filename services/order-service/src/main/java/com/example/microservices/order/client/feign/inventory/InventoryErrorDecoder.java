@@ -1,4 +1,4 @@
-package com.example.microservices.order.client.feign;
+package com.example.microservices.order.client.feign.inventory;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;

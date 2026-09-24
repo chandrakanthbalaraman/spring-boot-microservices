@@ -1,13 +1,14 @@
-# discovery-server (Phase 03 scaffold)
+# discovery-server (Phase 03)
 
-Eureka registry for SB-MS. You implement Slice A — this folder is structure only.
+Eureka registry for SB-MS. The implementation is present and compiles; the learner-owned runtime verification is still open.
 
-## Checklist (you fill)
+## Checklist
 
-- [ ] POM: `spring-cloud-starter-netflix-eureka-server`
-- [ ] `@EnableEurekaServer` on `DiscoveryServerApplication`
-- [ ] `application.yml`: port `8761`; client register/fetch **false**
-- [ ] Run: `mvn spring-boot:run -pl discovery-server` from `services/`
-- [ ] UI: http://localhost:8761
+- [x] POM: `spring-cloud-starter-netflix-eureka-server`
+- [x] `@EnableEurekaServer` on `DiscoveryServerApplication`
+- [x] `application.yml`: port `8761`; client register/fetch **false**
+- [x] Run: `mvn spring-boot:run -pl discovery-server` from `services/`
+- [x] UI: http://localhost:8761
+- [x] Confirm `PRODUCT-SERVICE`, `INVENTORY-SERVICE`, and `ORDER-SERVICE` register after they start
 
-Do **not** change Feign/WebClient `localhost` URLs in this slice.
+Order-service now uses name-only Feign clients. Do not add a `url` attribute to `@FeignClient`; Eureka plus Spring Cloud LoadBalancer resolves the service name.

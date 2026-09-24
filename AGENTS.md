@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 2 — slices A–E + pooling DONE · next Phase 03 discovery · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress (close when you merge/tag)**
+**Phase 03 — Eureka server/client wiring + name-based Feign + runtime discovery verified · next Slice E: Eureka vs Kubernetes Service DNS · Trello [Phase 01](https://trello.com/c/Ogs7VdO1) Done · [Phase 02](https://trello.com/c/Zkxt4CVl) In Progress (close when you merge/tag)**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -218,5 +218,5 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
 - [x] `.cursor/{agents,skills,commands,rules}` symlink to `.claude/` (2026-08-26)
-- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-22)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-22)
+- [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-23)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-23)

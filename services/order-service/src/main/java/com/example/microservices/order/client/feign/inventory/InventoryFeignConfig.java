@@ -1,4 +1,4 @@
-package com.example.microservices.order.config;
+package com.example.microservices.order.client.feign.inventory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -11,7 +11,7 @@ import org.springframework.cloud.loadbalancer.support.LoadBalancerClientFactory;
 import org.springframework.cloud.openfeign.loadbalancer.FeignBlockingLoadBalancerClient;
 import org.springframework.context.annotation.Bean;
 
-import com.example.microservices.order.client.feign.InventoryErrorDecoder;
+import com.example.microservices.order.config.InventoryClientProperties;
 
 import feign.Client;
 import feign.Logger;

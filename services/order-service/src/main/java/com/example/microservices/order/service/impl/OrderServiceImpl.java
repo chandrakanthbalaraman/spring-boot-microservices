@@ -16,9 +16,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.example.microservices.order.client.InventoryClient;
-import com.example.microservices.order.client.ProductClient;
 import com.example.microservices.order.client.dto.ProductResponse;
+import com.example.microservices.order.client.feign.inventory.InventoryClient;
+import com.example.microservices.order.client.feign.product.ProductClient;
 import com.example.microservices.order.dto.OrderCreateRequest;
 import com.example.microservices.order.dto.OrderItemRequest;
 import com.example.microservices.order.mapper.OrderMapper;

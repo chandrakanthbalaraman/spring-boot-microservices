@@ -570,27 +570,41 @@ Replace `http://localhost:8082` with the logical name `inventory-service`.
 Order → inventory-service → instance 1 / instance 2 / instance 3
 ```
 
+### Slices
+
+| Slice | Goal | Status |
+|-------|------|--------|
+| **A** | Run a standalone Eureka registry on `:8761` | DONE — server module plus dashboard verified by learner |
+| **B** | Register product, inventory, and order services | DONE — three registrations verified by learner |
+| **C** | Resolve both order-service neighbors by logical Feign name | DONE — name-only Feign order flow verified by learner |
+| **D** | Observe metadata and break discovery deliberately | DONE — runtime exercise verified by learner |
+| **E** | Compare Eureka with Kubernetes Service DNS | MISSING — next learner slice |
+
+**Current evidence:** `mvn test` is green for all four modules; the learner confirmed the registry, registration, name-based order flow, and break-it exercise on 2026-09-23.
+
 ### Learn
 
-- [ ] Service registry
-- [ ] Service discovery
-- [ ] Client-side discovery
+- [x] Service registry
+- [x] Service discovery
+- [x] Client-side discovery
 - [ ] Server-side discovery
-- [ ] Service registration
-- [ ] Health checks
-- [ ] Instance metadata
-- [ ] Load-balanced service calls
-- [ ] Spring Cloud LoadBalancer
-- [ ] Eureka
+- [x] Service registration
+- [x] Health checks
+- [x] Instance metadata
+- [x] Load-balanced service calls
+- [x] Spring Cloud LoadBalancer
+- [x] Eureka
 - [ ] Alternatives and when discovery is unnecessary in Kubernetes
 
 ### Hands-on
 
-- [ ] Add `discovery-server`
-- [ ] Register product, inventory, and order services
-- [ ] Call services by name, not host/port
-- [ ] Confirm health and instance metadata in the registry
+- [x] Add `discovery-server` (module, Eureka dependency, `@EnableEurekaServer`, port `8761`)
+- [x] Register product, inventory, and order services
+- [x] Call services by name, not host/port
+- [x] Confirm health and instance metadata in the registry
 - [ ] Compare Eureka vs Kubernetes DNS/Services (do not over-invest in Eureka)
+
+**Next slice:** E — distinguish Eureka client-side discovery from Kubernetes Service DNS and test what happens when only the discovery control plane stops.
 
 **Next:** Scale instances and distribute traffic.
 

@@ -1,4 +1,4 @@
-package com.example.microservices.order.client.feign;
+package com.example.microservices.order.client.feign.inventory;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.microservices.order.client.dto.InventoryResponse;
-import com.example.microservices.order.config.InventoryFeignConfig;
 
 /**
  * Declarative inventory client. No {@code url}: {@code name} is the Eureka

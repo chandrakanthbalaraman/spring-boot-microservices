@@ -1,8 +1,7 @@
-package com.example.microservices.order.client.feign;
+package com.example.microservices.order.client.feign.inventory;
 
 import org.springframework.stereotype.Component;
 
-import com.example.microservices.order.client.InventoryClient;
 import com.example.microservices.order.client.dto.InventoryResponse;
 import com.example.microservices.order.exception.DownstreamServiceUnavailableException;
 
