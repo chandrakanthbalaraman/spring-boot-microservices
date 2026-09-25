@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 3 is merged and tagged `phase-03-complete`. Eureka registration, name-based Feign calls, metadata, and the neighbor break-it are verified. The Kubernetes comparison is deferred to Phase 18. Next is Phase 04 load balancing.
+**Current curriculum focus:** Phase 04 Slices A–B done — two inventory instances register and Feign/LoadBalancer spreads traffic (`X-Instance-Port`). Next: Slice C skip unhealthy instances. Phase 03 tagged `phase-03-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 3 notes: [`docs/phases/phase-3/`](../docs/phases/phase-3/)
 
@@ -98,6 +98,14 @@ mvn spring-boot:run -pl discovery-server
 mvn spring-boot:run -pl product-service
 mvn spring-boot:run -pl inventory-service
 mvn spring-boot:run -pl order-service
+
+# Phase 04 — two stateless inventory instances (one terminal each).
+# Replaces the single inventory-service command above.
+# INV-A
+mvn spring-boot:run -pl inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=8091"
+
+# INV-B
+mvn spring-boot:run -pl inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=8092"
 ```
 
 Open http://localhost:8761 and wait until all three application names appear before testing the order flow.
@@ -140,6 +148,20 @@ Discovery adds no database changes. The three business services keep their exist
 
 `mvn test` proves all four modules compile; there are no substantive automated tests yet. The learner has supplied the required Phase 3 runtime evidence from the dashboard, end-to-end order path, metadata inspection, and break-it exercise.
 
+Phase 04 Slice A runtime evidence (2026-09-23):
+
+- Eureka reported `inventory-service:8091` and `inventory-service:8092` as `UP`.
+- Both ports returned HTTP `200` with the same database-backed inventory record.
+- A third process on `:8091` failed with `Port 8091 was already in use`; the healthy process subsequently re-registered.
+- The complete Maven reactor remained green.
+
+Phase 04 Slice B runtime evidence (2026-09-24):
+
+- Direct requests to both inventory instances returned the matching `X-Instance-Port` value.
+- Four fresh orders through the updated order-service returned HTTP `201` and alternated `8092 → 8091 → 8092 → 8091`.
+- Review result: **PASS WITH NOTES**. The diagnostic header is suitable for this lesson but should not become an accidental public production contract; focused propagation tests remain follow-up work.
+- The complete four-module Maven reactor remained green.
+
 ---
 
 ## Failure Scenarios
@@ -181,4 +203,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 04 — Load Balancing.** Next learning slice: run multiple stateless inventory-service instances on distinct ports and inspect their Eureka registrations.
+**Phase 04 — Load Balancing.** Slices A–B are verified. Next learning slice: stop or crash one inventory instance and measure when Eureka plus Spring Cloud LoadBalancer remove it from the candidate set.

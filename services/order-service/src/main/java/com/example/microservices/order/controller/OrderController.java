@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.microservices.order.client.feign.inventory.InventoryInstancePorts;
 import com.example.microservices.order.dto.OrderCreateRequest;
 import com.example.microservices.order.dto.OrderResponse;
 import com.example.microservices.order.service.OrderService;
@@ -29,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderController {
 
     private final OrderService orderService;
+    private final InventoryInstancePorts inventoryInstancePorts;
 
     @PostMapping
     @Operation(summary = "Create a new order")
@@ -41,7 +43,11 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderCreateRequest orderCreateRequest, 
         @RequestHeader("Idempotency-Key") String idempotencyKey) {
         OrderResponse orderResponse = orderService.createOrder(orderCreateRequest, idempotencyKey);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponse);
+        ResponseEntity.BodyBuilder builder = ResponseEntity.status(HttpStatus.CREATED);
+        for (String port : inventoryInstancePorts.ports()) {
+            builder.header(InventoryInstancePorts.HEADER, port);
+        }
+        return builder.body(orderResponse);
     }
 
     @GetMapping("/{orderId}")

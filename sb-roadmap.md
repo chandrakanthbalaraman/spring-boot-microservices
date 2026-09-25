@@ -117,7 +117,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 01 | Microservices Architecture Fundamentals | tag `phase-01-complete` | DONE (tests N/A) |
 | 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
-| 04 | Load Balancing | `feature/phase-04-load-balancing` | MISSING (next) |
+| 04 | Load Balancing | `feature/phase-04-load-balancing` | PARTIAL — Slices A–B DONE; C–D open |
 | 05 | API Gateway | `feature/phase-05-api-gateway` | [ ] |
 | 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
@@ -606,7 +606,7 @@ Order → inventory-service → instance 1 / instance 2 / instance 3
 
 **Phase 03 release checkpoint:** merged to `main` and tagged `phase-03-complete`. The Kubernetes comparison stays open under Phase 18.
 
-**Next learning slice:** Phase 04 Slice A — run multiple stateless inventory-service instances on distinct ports and inspect their Eureka registrations before measuring traffic distribution.
+**Next learning slice:** Phase 04 Slice C — prove Feign/LoadBalancer skips an unhealthy inventory instance so orders still succeed on the survivor.
 
 ---
 
@@ -627,26 +627,39 @@ Scale services. Keep them stateless.
                  INV1   INV2   INV3
 ```
 
+### Slices
+
+| Slice | Goal | Status |
+|-------|------|--------|
+| **A** | Launch two inventory instances (`:8091` / `:8092`) with unique Eureka `instance-id`; confirm both register | DONE — `instance-id: ${spring.application.name}:${server.port}`; live Eureka showed both `UP` |
+| **B** | Demonstrate traffic distribution across instances | DONE — `InventoryInstanceHeaderFilter` (`X-Instance-Port`); reviewed Feign path alternated `8092 → 8091 → 8092 → 8091`, all HTTP `201`; filter uses constructor `@Value` (2026-09-24, uncommitted) |
+| **C** | Prove unhealthy instances are skipped | MISSING — next |
+| **D** | Confirm services stay stateless under scale (no sticky in-memory stock) | PARTIAL — shared `inventory_db`; formal sticky/session proof still open |
+
 ### Learn
 
-- [ ] Client-side load balancing
+- [x] Client-side load balancing — Feign + LoadBalancer spread across `:8091` / `:8092`
 - [ ] Server-side load balancing
-- [ ] Spring Cloud LoadBalancer
-- [ ] Round robin
+- [x] Spring Cloud LoadBalancer — distribution observed on live order path
+- [x] Round robin — alternating instance ports under multi-POST load
 - [ ] Weighted strategies
-- [ ] Health-aware routing
+- [ ] Health-aware routing — Slice C
 - [ ] Sticky sessions (and why to avoid them)
-- [ ] Horizontal scaling
-- [ ] Stateless services
+- [x] Horizontal scaling — two inventory JVMs on distinct ports
+- [x] Stateless services — stock in Postgres (`inventory_db`), not JVM memory
 
 ### Hands-on
 
-- [ ] Run multiple `inventory-service` instances on distinct non-conflicting ports (for example `:8091`, `:8092`, `:8093`)
-- [ ] Demonstrate traffic distribution
+- [x] Run multiple `inventory-service` instances on distinct non-conflicting ports (for example `:8091`, `:8092`, `:8093`)
+- [x] Demonstrate traffic distribution
 - [ ] Prove unhealthy instances are skipped
-- [ ] Confirm services stay stateless under scale
+- [x] Confirm services stay stateless under scale — shared DB; Slice D formalizes anti-sticky lesson if needed
 
-**Next slice:** A — launch two inventory-service instances with unique instance metadata, confirm both register in Eureka, and keep product/order ports unchanged.
+**Slice A evidence (2026-09-23):** Eureka reported `inventory-service:8091` and `inventory-service:8092` as `UP`. Direct GETs to both ports returned HTTP `200` with identical product state from `inventory_db`.
+
+**Slice B evidence (2026-09-24):** `InventoryInstanceHeaderFilter` sets `X-Instance-Port`; direct curls matched ports. Four fresh POSTs through the updated order-service returned HTTP `201` and alternated `8092 → 8091 → 8092 → 8091`. The four-module Maven reactor passed. Review result: **PASS WITH NOTES** — add focused header-propagation tests later and treat the diagnostic header as temporary/internal. Break-it “stop one instance” belongs to Slice C.
+
+**Next slice:** C — stop or kill one inventory instance and show LoadBalancer routes to the remaining healthy instance (orders still 201 once the dead instance is out of the candidate set).
 
 **Next:** Introduce a single real entry point.
 

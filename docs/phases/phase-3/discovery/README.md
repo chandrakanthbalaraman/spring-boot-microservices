@@ -23,6 +23,13 @@ Eureka is a **teaching** discovery tool. Kubernetes Service DNS supersedes it la
 
 Phase index: [`../`](../) · Catalog: [`../../README.md`](../../README.md). Phase 2 clients: [`../../phase-2/clients/`](../../phase-2/clients/).
 
+## One-page infographics
+
+- [`Service registry`](../infographics/01-service-registry.png)
+- [`Service discovery`](../infographics/02-service-discovery.png)
+- [`Service discovery intervals`](../infographics/03-service-discovery-intervals.png)
+- [`Infographic notes and implementation anchors`](../infographics/README.md)
+
 ---
 
 ## Caption seed

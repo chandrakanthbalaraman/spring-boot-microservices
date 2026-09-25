@@ -1,6 +1,7 @@
 package com.example.microservices.order.client.feign.inventory;
 
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +19,11 @@ import com.example.microservices.order.client.dto.InventoryResponse;
 public interface InventoryFeignApi {
     
     @GetMapping("/api/v1/inventories/{productId}")
-    InventoryResponse getInventoryByProductId(@PathVariable Long productId);
+    ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable Long productId);
 
     @PostMapping("/api/v1/inventories/{productId}/reserve-stock")
-    InventoryResponse reserveStockByProductId(@PathVariable Long productId, @RequestParam int quantity);
+    ResponseEntity<InventoryResponse> reserveStockByProductId(@PathVariable Long productId, @RequestParam int quantity);
 
     @PostMapping("/api/v1/inventories/{productId}/release-stock")
-    InventoryResponse releaseStockByProductId(@PathVariable Long productId, @RequestParam int quantity);
+    ResponseEntity<InventoryResponse> releaseStockByProductId(@PathVariable Long productId, @RequestParam int quantity);
 }
