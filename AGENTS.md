@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 05 — Slices A–B DONE: order, product, and inventory Gateway routes plus outage/recovery verified; next: Slice C correlation IDs + basic observability · Phase 04 DONE (`phase-04-complete`) · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 05](https://trello.com/c/HgPr4pjC) In Progress**
+**Phase 05 — Slices A–C DONE: routes, correlation IDs, Gateway health/logs/metrics verified; next: Slice D CORS + rate-limit awareness · Phase 04 DONE (`phase-04-complete`) · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 05](https://trello.com/c/HgPr4pjC) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

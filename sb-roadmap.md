@@ -118,7 +118,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
-| 05 | API Gateway | `feature/phase-05-api-gateway` | PARTIAL — Slices A–B DONE; next Slice C correlation IDs + basic observability |
+| 05 | API Gateway | `feature/phase-05-api-gateway` | PARTIAL — Slices A–C DONE; next Slice D CORS + rate-limit awareness |
 | 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
@@ -667,7 +667,7 @@ Scale services. Keep them stateless.
 
 **Phase 04 release checkpoint:** merged to `main` and tagged `phase-04-complete`.
 
-**Next:** Phase 05 Slice A — scaffold Spring Cloud Gateway as the sole client entry point (`lb://` routes).
+**Next:** Phase 05 — API Gateway (in progress: Slices A–C DONE; next Slice D CORS + rate-limit awareness).
 
 ---
 
@@ -696,23 +696,25 @@ spring:
         - id: order-service
           uri: lb://order-service
           predicates:
-            - Path=/api/orders/**
+            - Path=/api/v1/orders/**
 ```
+
+Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`, `/api/v1/products/**` → `lb://product-service`, `/api/v1/inventories/**` → `lb://inventory-service`. Gateway listens on `:8080`.
 
 ### Learn
 
 - [x] Spring Cloud Gateway
 - [x] Routing
 - [x] Predicates
-- [ ] Filters
+- [x] Filters
 - [ ] Authentication (gateway-level awareness)
 - [ ] Authorization (gateway-level awareness)
 - [ ] Rate limiting
-- [ ] Request transformation
+- [x] Request transformation
 - [ ] CORS
 - [ ] API versioning
-- [ ] Correlation IDs
-- [ ] Gateway observability
+- [x] Correlation IDs
+- [x] Gateway observability
 
 ### Slices
 
@@ -720,18 +722,24 @@ spring:
 |-------|------|--------|
 | **A** | Scaffold `api-gateway` module + Spring Cloud Gateway; route one path via `lb://order-service` | DONE — six-module reactor green; Gateway registered `UP`; proxied order `1` returned `200`; predicate miss returned `404`; learner observed no-instance `503` after Eureka convergence; recovered route independently rechecked at `200` after restart (2026-09-25) |
 | **B** | Route products + inventory; gateway becomes sole external entry | DONE — both `lb://` routes returned `200` with bodies matching direct calls; product outage showed stale-instance `500`, converged no-instance `503`, unaffected inventory `200`, then product recovery to `200`; six-module build green (2026-09-25). Non-blocking note: Gateway module descriptions still use stale Slice A/C wording |
-| **C** | Correlation IDs + basic observability (logs/metrics) | [ ] |
+| **C** | Correlation IDs + basic observability (logs/metrics) | DONE — `GlobalFilter` preserves or generates `X-Correlation-ID`, forwards it and returns it; Actuator health returned `UP`; `spring.cloud.gateway.requests` exposed route/status metrics; Gateway packaged successfully (2026-09-25). Notes: automated filter tests intentionally deferred; exception-path completion logs may have `status=null` |
 | **D** | CORS + rate-limit awareness (minimal working config) | [ ] |
 
 ### Hands-on
 
 - [x] Add API Gateway as the intended client entry point
 - [x] Route `/api/orders/**`, products, inventory via `lb://`
-- [ ] Add correlation IDs
+- [x] Add correlation IDs
 - [ ] Configure CORS and rate limiting
-- [ ] Observe gateway metrics/logs
+- [x] Observe gateway metrics/logs
 
-**Next slice:** C — add correlation IDs and basic Gateway logs/metrics; also clean the stale Slice A/C wording in the Gateway module.
+**Slice A evidence (reviewed, 2026-09-25):** Eureka reported `API-GATEWAY` `UP` on `:8080`. `GET :8080/api/v1/orders/1` returned `200` matching direct `:8083`. Unconfigured product path returned Gateway `404`. With order-service stopped and Eureka converged, the matched route returned `503`; after restart it recovered to `200`.
+
+**Slice B evidence (reviewed, 2026-09-25):** Product and inventory Gateway bodies matched direct calls. Product outage moved from a stale-instance `500` to a converged no-instance `503` while inventory stayed `200`; all three routes returned `200` after recovery. Six-module `mvn clean test` green.
+
+**Slice C evidence (reviewed, 2026-09-25):** `CorrelationIdFilter` preserves a valid `X-Correlation-ID` or generates a UUID, forwards it, and returns it. Actuator health was `UP`. `spring.cloud.gateway.requests` exposed route/status metrics. Gateway package build succeeded. Notes: automated filter tests deferred; a cancelled exchange can log before a status exists.
+
+**Next slice:** D — add minimal CORS configuration and rate-limit awareness; carry forward the stale Gateway wording and exception-log status notes.
 
 **Next:** Centralize configuration.
 

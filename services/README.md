@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 05 Slices A–B are DONE — order, product, and inventory Gateway routes plus outage/recovery are verified. Next: Slice C correlation IDs and basic observability. Phase 04 is tagged `phase-04-complete`.
+**Current curriculum focus:** Phase 05 Slices A–C are DONE — routes, correlation IDs, Gateway health, request logs, and metrics are verified. Next: Slice D CORS and rate-limit awareness. Phase 04 is tagged `phase-04-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -198,6 +198,14 @@ Phase 05 Slice B evidence (reviewed, 2026-09-25):
 - Inventory remained available through Gateway, and after product-service restarted plus Gateway refreshed, all three Gateway routes returned `200` (final recheck 2026-09-25 16:13 UTC).
 - Non-blocking cleanup remains: stale Slice A/C comments plus module README/POM/Javadoc wording.
 
+Phase 05 Slice C evidence (reviewed, 2026-09-25):
+
+- `CorrelationIdFilter` preserves a valid client `X-Correlation-ID`, generates a UUID when absent, forwards the header, and adds it to the response.
+- Runtime checks returned the supplied ID `review-slice-c-001` and a generated UUID on separate routed requests.
+- `/actuator/health` returned `200` with `UP`; `/actuator/metrics/spring.cloud.gateway.requests` returned request count/time plus route, method, outcome, and status tags.
+- `mvn -pl api-gateway clean package -DskipTests` completed successfully; automated filter tests were intentionally deferred for this learning slice.
+- Review note: exception-based failures can complete the filter before the outer error handler assigns an HTTP status, so the completion log may show `status=null`.
+
 ---
 
 ## Failure Scenarios
@@ -225,7 +233,7 @@ Phase 05 Slice B evidence (reviewed, 2026-09-25):
 - [x] **Slice A predicate boundary:** unconfigured product path returns Gateway `404`.
 - [x] **Slice A break-it:** stop order-service, observe eventual Gateway `503`, restart, and prove recovery.
 - [x] **Slice B:** product/inventory routes, direct-vs-Gateway happy paths, product-outage `503`, route isolation, and recovery verified.
-- [ ] **Slice C:** correlation IDs and basic gateway logs/metrics.
+- [x] **Slice C:** correlation IDs and basic Gateway health/logs/metrics verified; focused automated tests intentionally deferred.
 - [ ] **Slice D:** CORS and rate-limit awareness.
 
 ---
@@ -238,4 +246,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 05 — API Gateway.** Slices A–B are DONE. Next: Slice C correlation IDs and basic observability; carry the stale Gateway module wording as cleanup.
+**Phase 05 — API Gateway.** Slices A–C are DONE. Next: Slice D CORS and rate-limit awareness; carry the stale Gateway wording and exception-log status notes as cleanup.

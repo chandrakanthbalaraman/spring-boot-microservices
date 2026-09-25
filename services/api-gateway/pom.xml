@@ -14,6 +14,11 @@
     <name>api-gateway</name>
     <description>Phase 05 — Spring Cloud Gateway (sole client entry; routes + correlation IDs)</description>
 
+    <properties>
+        <!-- Starter line for Boot 3.5. 0.14.x targets Boot 4. The starter pulls Bucket4j 8.14.0. -->
+        <bucket4j-starter.version>0.13.0</bucket4j-starter.version>
+    </properties>
+
     <dependencies>
         <!-- WebFlux Gateway — must NOT pull spring-boot-starter-web (MVC conflict). -->
         <dependency>
@@ -32,6 +37,17 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- In-process rate-limit buckets. Caffeine version comes from the Boot BOM. -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+        <!-- Servlet web starter is provided inside this artifact, so it does not land on the Gateway classpath. -->
+        <dependency>
+            <groupId>com.giffing.bucket4j.spring.boot.starter</groupId>
+            <artifactId>bucket4j-spring-boot-starter</artifactId>
+            <version>${bucket4j-starter.version}</version>
         </dependency>
     </dependencies>
 

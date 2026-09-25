@@ -13,6 +13,6 @@ Detailed topic infographic: [`Load Balancing — concepts, algorithms, implement
 
 Algorithm comparison: [`Load Balancing Algorithms — workings, pros, cons, and selection guide`](./infographics/05-load-balancing-algorithms.png)
 
-**Status (2026-09-25):** DONE · review PASS WITH NOTES · tagged `phase-04-complete` · Phase 05 Slice A is next.
+**Status (2026-09-25):** DONE · review PASS WITH NOTES · tagged `phase-04-complete`. Phase 05 is in progress (Slices A–C DONE).
 
 Catalog: [`../README.md`](../README.md) · Roadmap: [`../../../sb-roadmap.md`](../../../sb-roadmap.md).
