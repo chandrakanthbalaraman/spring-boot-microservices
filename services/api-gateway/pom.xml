@@ -12,7 +12,7 @@
 
     <artifactId>api-gateway</artifactId>
     <name>api-gateway</name>
-    <description>Phase 05 — Spring Cloud Gateway (sole client entry; Slice A scaffold)</description>
+    <description>Phase 05 — Spring Cloud Gateway (sole client entry; routes + correlation IDs)</description>
 
     <dependencies>
         <!-- WebFlux Gateway — must NOT pull spring-boot-starter-web (MVC conflict). -->

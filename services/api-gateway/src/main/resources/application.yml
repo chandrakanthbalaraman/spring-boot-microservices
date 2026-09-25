@@ -8,17 +8,17 @@ spring:
           metrics:
             enabled: true
           routes:
-            # Slice A — one route only. Product/inventory routes land in Slice B.
+            # Slice A
             - id: order-service
               uri: lb://order-service
               predicates:
                 - Path=/api/v1/orders/**
-            # Slice B — two routes. Product service routes land in Slice B.
+            # Slice B
             - id: product-service
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
-            # Slice B — two routes. Inventory service routes land in Slice C.
+            # Slice B
             - id: inventory-service
               uri: lb://inventory-service
               predicates:

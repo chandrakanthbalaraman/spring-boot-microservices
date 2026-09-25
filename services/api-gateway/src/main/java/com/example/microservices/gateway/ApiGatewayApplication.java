@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Phase 05 · Slice A — Spring Cloud Gateway entrypoint.
- * Routes live in {@code application.yml}; no business logic here.
+ * Phase 05 — Spring Cloud Gateway entrypoint.
+ * Routes live in {@code application.yml}; cross-cutting filters under {@code filters}.
  */
 @SpringBootApplication
 public class ApiGatewayApplication {
