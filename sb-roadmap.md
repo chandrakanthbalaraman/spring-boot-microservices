@@ -118,7 +118,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
-| 05 | API Gateway | `feature/phase-05-api-gateway` | NEXT — Slice A (scaffold gateway entry) |
+| 05 | API Gateway | `feature/phase-05-api-gateway` | PARTIAL — Slices A–B DONE; next Slice C correlation IDs + basic observability |
 | 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
@@ -701,9 +701,9 @@ spring:
 
 ### Learn
 
-- [ ] Spring Cloud Gateway
-- [ ] Routing
-- [ ] Predicates
+- [x] Spring Cloud Gateway
+- [x] Routing
+- [x] Predicates
 - [ ] Filters
 - [ ] Authentication (gateway-level awareness)
 - [ ] Authorization (gateway-level awareness)
@@ -718,20 +718,20 @@ spring:
 
 | Slice | Goal | Status |
 |-------|------|--------|
-| **A** | Scaffold `api-gateway` module + Spring Cloud Gateway; route one path via `lb://order-service` | NEXT |
-| **B** | Route products + inventory; gateway becomes sole external entry | [ ] |
+| **A** | Scaffold `api-gateway` module + Spring Cloud Gateway; route one path via `lb://order-service` | DONE — six-module reactor green; Gateway registered `UP`; proxied order `1` returned `200`; predicate miss returned `404`; learner observed no-instance `503` after Eureka convergence; recovered route independently rechecked at `200` after restart (2026-09-25) |
+| **B** | Route products + inventory; gateway becomes sole external entry | DONE — both `lb://` routes returned `200` with bodies matching direct calls; product outage showed stale-instance `500`, converged no-instance `503`, unaffected inventory `200`, then product recovery to `200`; six-module build green (2026-09-25). Non-blocking note: Gateway module descriptions still use stale Slice A/C wording |
 | **C** | Correlation IDs + basic observability (logs/metrics) | [ ] |
 | **D** | CORS + rate-limit awareness (minimal working config) | [ ] |
 
 ### Hands-on
 
-- [ ] Add API Gateway as the only client entry point
-- [ ] Route `/api/orders/**`, products, inventory via `lb://`
+- [x] Add API Gateway as the intended client entry point
+- [x] Route `/api/orders/**`, products, inventory via `lb://`
 - [ ] Add correlation IDs
 - [ ] Configure CORS and rate limiting
 - [ ] Observe gateway metrics/logs
 
-**Next slice:** A — create `api-gateway` on `feature/phase-05-api-gateway` and prove one `lb://` route.
+**Next slice:** C — add correlation IDs and basic Gateway logs/metrics; also clean the stale Slice A/C wording in the Gateway module.
 
 **Next:** Centralize configuration.
 

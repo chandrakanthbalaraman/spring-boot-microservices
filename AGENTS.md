@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 05 — next Slice A: scaffold Spring Cloud Gateway as sole client entry · Phase 04 DONE (`phase-04-complete`) · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 05](https://trello.com/c/HgPr4pjC) Backlog**
+**Phase 05 — Slices A–B DONE: order, product, and inventory Gateway routes plus outage/recovery verified; next: Slice C correlation IDs + basic observability · Phase 04 DONE (`phase-04-complete`) · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 05](https://trello.com/c/HgPr4pjC) Backlog**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

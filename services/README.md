@@ -2,57 +2,60 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 04 Slices A–D done — dual inventory instances, Feign distribution, unhealthy-instance convergence, and stateless/anti-sticky behavior are learner-verified. Next: Phase 04 review/merge/tag checkpoint before Phase 05 Gateway.
+**Current curriculum focus:** Phase 05 Slices A–B are DONE — order, product, and inventory Gateway routes plus outage/recovery are verified. Next: Slice C correlation IDs and basic observability. Phase 04 is tagged `phase-04-complete`.
 
-Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 3 notes: [`docs/phases/phase-3/`](../docs/phases/phase-3/)
+Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
 ---
 
 ## Objective
 
-Phase 2 made HTTP clients deliberate. Phase 3 removes physical neighbor addresses from the live order path:
+Phase 4 proved client-side load balancing across inventory instances. Phase 5 adds a single external front door:
 
-- Run a standalone Eureka registry on `:8761`
-- Register product, inventory, and order under `spring.application.name`
-- Resolve `product-service` and `inventory-service` through name-only Feign clients
-- Observe registration, heartbeat, and instance metadata before changing more code
-- Preserve Phase 2 timeout, pooling, error mapping, and idempotency behavior
+- Run Spring Cloud Gateway on `:8080`
+- Route `/api/v1/orders/**` via `lb://order-service` (Slice A)
+- Keep Eureka + Feign for service-to-service calls
+- Expand to product/inventory routes and cross-cutting filters in later slices
 
-Eureka is a teaching tool here. Kubernetes Service DNS replaces this mechanism in the later Kubernetes phases.
+Eureka remains the teaching discovery tool; Kubernetes Ingress/Service DNS appear in later phases.
 
 ---
 
 ## Architecture
 
 ```
-                       discovery-server :8761
-                         registry / lookup
-                        /        |        \
-                       v         v         v
-              product-service inventory-service order-service
-                    ^               ^               :8083
-                     \             /
-                      name-only Feign
+                   Client
+                      │
+                      ▼
+               api-gateway :8080
+                 Path=/api/v1/orders/**
+                      │ lb://order-service
+                      ▼
+                 order-service :8083
+                    │        │
+             Feign/LB        Feign/LB
+                    ▼        ▼
+              product     inventory
 ```
 
-| Preserved from Phase 2 | New in Phase 3 |
-|------------------------|----------------|
-| Feign timeouts + HC5 pools | Eureka registry and clients |
-| Typed downstream errors | Logical service names instead of Feign URLs |
-| `Idempotency-Key` on create order | Registration, heartbeat, and instance metadata |
-| Manual compensation | Client-side discovery via Spring Cloud LoadBalancer |
+| Preserved from Phase 4 | New in Phase 5 Slice A |
+|------------------------|------------------------|
+| Feign + RoundRobin to inventory | Gateway as client entry |
+| Dual inventory instances | One `lb://order-service` route |
+| Eureka registry | Gateway registers / discovers via Eureka |
 
-Out of scope here: multiple-instance traffic distribution, Gateway, and Resilience4j (Phases 4 / 5 / 7).
+Out of scope here: product/inventory gateway routes, CORS, rate limits, auth (later slices / phases).
 
 ---
 
 ## Services
 
-Unchanged ports and DBs. Run Compose from `infrastructure/docker/postgres` (same as Phase 1).
+Unchanged ports and DBs for business services. Run Compose from `infrastructure/docker/postgres` (same as Phase 1).
 
 | Service | Port | DB |
 |---------|------|-----|
 | `discovery-server` | 8761 | none |
+| `api-gateway` | 8080 | none |
 | `product-service` | 8081 | `product_db` :5433 |
 | `inventory-service` | 8082 | `inventory_db` :5434 |
 | `order-service` | 8083 | `order_db` :5435 |
@@ -61,7 +64,7 @@ Unchanged ports and DBs. Run Compose from `infrastructure/docker/postgres` (same
 
 ## Prerequisites
 
-JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 2 timeout/error/idempotency behavior.
+JDK 21 · Maven 3.9+ · Docker Compose (three Postgres) · Phase 04 load-balancing behavior.
 
 ---
 
@@ -72,6 +75,7 @@ services/
 ├── pom.xml                 # phase Maven parent (artifact: services)
 ├── README.md
 ├── discovery-server/       # Eureka registry; no database
+├── api-gateway/            # Spring Cloud Gateway (WebFlux); no database
 ├── product-service/
 ├── inventory-service/
 └── order-service/          # name-only Feign clients resolve through Eureka
@@ -146,7 +150,7 @@ Discovery adds no database changes. The three business services keep their exist
 
 ## Testing
 
-`mvn test` proves all four modules compile; there are no substantive automated tests yet. The learner has supplied the required Phase 3 runtime evidence from the dashboard, end-to-end order path, metadata inspection, and break-it exercise.
+`mvn clean test` proves all six modules compile; there are no substantive automated tests yet. Runtime evidence remains part of each learning slice.
 
 Phase 04 Slice A runtime evidence (2026-09-23):
 
@@ -176,36 +180,53 @@ Phase 04 Slice D runtime evidence (learner verified, 2026-09-24):
 - Load-balanced orders changed one shared stock value, and that state survived stopping and restarting an inventory instance.
 - No sticky routing, HTTP session, or JVM-local stock storage was introduced.
 
+Phase 05 Slice A runtime evidence (reviewed, 2026-09-25):
+
+- Eureka reported `API-GATEWAY` as `UP` on `:8080`.
+- `GET :8080/api/v1/orders/1` returned HTTP `200` with the same payload as direct `:8083`.
+- The unconfigured `GET :8080/api/v1/products/1` returned Gateway HTTP `404`.
+- With order-service stopped and Eureka converged, the learner observed Gateway HTTP `503` for the matched order route.
+- After order-service restarted and re-registered, `GET :8080/api/v1/orders/1` recovered to HTTP `200`; the recovered route was independently rechecked.
+
+Phase 05 Slice B evidence (reviewed, 2026-09-25):
+
+- A fresh six-module `mvn clean test` completed with `BUILD SUCCESS`; the Gateway module still has no substantive automated tests.
+- Gateway `GET /api/v1/products/1` returned `200` with a body identical to direct product-service.
+- Gateway `GET /api/v1/inventories/1` returned `200` through instance `:8092`, with a body identical to the direct `:8091` response.
+- The existing Gateway order route still returned `200`.
+- Immediately after product-service stopped, its stale registered instance produced a transient Gateway `500`; after Eureka convergence, the matched product route returned the expected no-instance `503`.
+- Inventory remained available through Gateway, and after product-service restarted plus Gateway refreshed, all three Gateway routes returned `200` (final recheck 2026-09-25 16:13 UTC).
+- Non-blocking cleanup remains: stale Slice A/C comments plus module README/POM/Javadoc wording.
+
 ---
 
 ## Failure Scenarios
 
-1. Start order-service before Eureka and observe registration/lookup behavior; then start Eureka and watch recovery.
-2. With all services registered, stop `inventory-service`; repeat `POST /api/v1/orders` immediately, then observe how long the stale registration remains visible.
-3. Confirm the caller gets the existing typed **503**, not a raw `No servers available` message or an indefinite hang.
-4. Restart inventory-service and observe it re-register before repeating the happy path.
+1. Call an unconfigured gateway path such as `/api/v1/products/1`; confirm the predicate miss returns `404`.
+2. Stop order-service while Gateway remains running; observe the stale-registration interval.
+3. After Eureka convergence, confirm `lb://order-service` returns Gateway `503` because no instance is available.
+4. Restart order-service and verify the same Gateway route recovers after registration.
 
 ---
 
 ## Current lesson
 
-- A registry maps a logical service id to one or more physical instances.
-- A Eureka client both registers itself and fetches registry data.
-- `@FeignClient(name = "inventory-service")` becomes a discovery lookup only when no fixed `url` overrides it.
-- Discovery finds an instance; it does not replace timeout, pooling, error mapping, idempotency, or resilience.
-
-Study pack: [`docs/phases/phase-3/discovery/`](../docs/phases/phase-3/discovery/)
+- Gateway is the client-facing reverse proxy; business logic remains in downstream services.
+- A route combines an id, destination URI, predicates, and optional filters.
+- `Path=/api/v1/orders/**` selects the route; `lb://order-service` resolves its destination through Eureka and ReactorLoadBalancer.
+- Predicate miss (`404`) and matched route with no service instance (`503`) are different failures.
 
 ---
 
 ## Exercises (do in order — do not dump the phase)
 
-- [x] **Slice A code — Eureka server:** module, server dependency, `@EnableEurekaServer`, standalone client settings.
-- [x] **Slice A proof:** start `discovery-server`; inspect the empty dashboard.
-- [x] **Slice B proof — registration:** start all three business services; record their application ids and instance metadata.
-- [x] **Slice C proof — name-based calls:** create an order and confirm product/inventory Feign logs use discovered instances.
-- [x] **Slice D — break discovery:** stop one neighbor, observe eviction/failure, then recover it.
-- [x] **Slice E scope decision — N/A (intentional):** defer Eureka vs Kubernetes Services until Phase 18, when the comparison can use a real cluster.
+- [x] **Slice A scaffold:** WebFlux Gateway module on `:8080`, Eureka client, one `lb://order-service` route.
+- [x] **Slice A happy path:** Gateway order response matches direct order-service response.
+- [x] **Slice A predicate boundary:** unconfigured product path returns Gateway `404`.
+- [x] **Slice A break-it:** stop order-service, observe eventual Gateway `503`, restart, and prove recovery.
+- [x] **Slice B:** product/inventory routes, direct-vs-Gateway happy paths, product-outage `503`, route isolation, and recovery verified.
+- [ ] **Slice C:** correlation IDs and basic gateway logs/metrics.
+- [ ] **Slice D:** CORS and rate-limit awareness.
 
 ---
 
@@ -217,4 +238,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 04 — Load Balancing.** Slices A–D are verified. Next: review the Phase 04 branch, merge it to `main`, and tag `phase-04-complete` before Phase 05 Gateway.
+**Phase 05 — API Gateway.** Slices A–B are DONE. Next: Slice C correlation IDs and basic observability; carry the stale Gateway module wording as cleanup.
