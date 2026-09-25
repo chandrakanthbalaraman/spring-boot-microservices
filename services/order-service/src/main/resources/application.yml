@@ -22,6 +22,11 @@ spring:
   mvc:
     problemdetails:
       enabled: true
+  cloud:
+    loadbalancer:
+      cache:
+        ttl: 5s          # default 35s — stale instance lists die faster
+        # enabled: false # nuclear option for learning: always ask DiscoveryClient
 server:
   port: 8083
 
@@ -29,20 +34,18 @@ logging:
   level:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
     com.example.microservices.order.client.feign: DEBUG
 
 # Feign resolves product-service and inventory-service through Eureka.
-# base-url is only the leftover RestClient beans; those need an absolute URL.
 clients:
   product-service:
-    base-url: http://localhost:8081
     connect-timeout: 500ms
     read-timeout: 2s
     max-connections: 50
     max-connections-per-route: 20
 
   inventory-service:
-    base-url: http://localhost:8082
     connect-timeout: 500ms
     read-timeout: 2s
     max-connections: 50
@@ -50,6 +53,7 @@ clients:
 
 eureka:
   client:
+    registry-fetch-interval-seconds: 5   # default 30 — pull Eureka more often
     service-url:
       defaultZone: http://localhost:8761/eureka
   instance:

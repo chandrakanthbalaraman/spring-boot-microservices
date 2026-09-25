@@ -28,8 +28,8 @@ import feign.hc5.ApacheHttp5Client;
 public class InventoryFeignConfig {
 
     /**
-     * Same 500ms / 2s budget as {@code inventoryRestClient}. One YAML source
-     * ({@link InventoryClientProperties}); Feign does not get a second millisecond copy.
+     * Timeouts come from {@link InventoryClientProperties}
+     * ({@code clients.inventory-service} in YAML).
      */
     @Bean
     public Request.Options inventoryFeignOptions(InventoryClientProperties properties) {

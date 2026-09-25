@@ -71,8 +71,29 @@ mvn spring-boot:run
 
 Same pattern for later phases, for example `services/order-service`. `clean install -U` is the command to re-run after adding a client library (RestClient factory, OpenFeign, WebClient) so the new artifacts actually land on the classpath.
 
+Two stateless inventory instances (Phase 04). Run each command in its own terminal, from `services/`. The `-Dserver.port` value is a system property of the forked app JVM, so it overrides `server.port: 8082` in `application.yml`.
+
+```bash
+# INV-A
+mvn spring-boot:run -pl inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=8091"
+
+# INV-B
+mvn spring-boot:run -pl inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=8092"
+```
+
 ---
 
+Graceful shutdown sends a deregistration signal. A crash cannot, so Eureka must infer failure from missing heartbeats.
+First identify the exact :8092 process:
+
+```bash
+lsof -nP -iTCP:8092 -sTCP:LISTEN
+```
+Confirm that the listed Java process is the inventory instance. Then replace 12345 with that exact PID:
+
+```bash
+kill -9 12345
+```
 ## How we learn
 
 ```text

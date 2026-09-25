@@ -117,8 +117,8 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 01 | Microservices Architecture Fundamentals | tag `phase-01-complete` | DONE (tests N/A) |
 | 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
-| 04 | Load Balancing | `feature/phase-04-load-balancing` | MISSING (next) |
-| 05 | API Gateway | `feature/phase-05-api-gateway` | [ ] |
+| 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
+| 05 | API Gateway | `feature/phase-05-api-gateway` | NEXT — Slice A (scaffold gateway entry) |
 | 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
@@ -606,7 +606,7 @@ Order → inventory-service → instance 1 / instance 2 / instance 3
 
 **Phase 03 release checkpoint:** merged to `main` and tagged `phase-03-complete`. The Kubernetes comparison stays open under Phase 18.
 
-**Next learning slice:** Phase 04 Slice A — run multiple stateless inventory-service instances on distinct ports and inspect their Eureka registrations before measuring traffic distribution.
+**Phase 04 release checkpoint:** reviewed **PASS WITH NOTES** (2026-09-25), merged to `main`, and tagged `phase-04-complete`. Weighted + server-side LB remain N/A (intentional).
 
 ---
 
@@ -627,28 +627,47 @@ Scale services. Keep them stateless.
                  INV1   INV2   INV3
 ```
 
+### Slices
+
+| Slice | Goal | Status |
+|-------|------|--------|
+| **A** | Launch two inventory instances (`:8091` / `:8092`) with unique Eureka `instance-id`; confirm both register | DONE — `instance-id: ${spring.application.name}:${server.port}` |
+| **B** | Demonstrate traffic distribution across instances | DONE — `X-Instance-Port` + Feign alternation `8092→8091→…`; header propagation via `InventoryInstancePorts` |
+| **C** | Prove unhealthy instances are skipped | DONE — shortened inventory leases (5s/15s) + order Eureka fetch 5s + LoadBalancer cache TTL 5s; learner observed 503 during detection lag after kill, then recovery on survivor (2026-09-24, committed `06b6c55`) |
+| **D** | Confirm services stay stateless under scale (no sticky in-memory stock) | DONE — learner verified cross-instance reads/mutations, shared versioned state, load-balanced orders, and persistence through instance stop/restart (2026-09-24) |
+
 ### Learn
 
-- [ ] Client-side load balancing
-- [ ] Server-side load balancing
-- [ ] Spring Cloud LoadBalancer
-- [ ] Round robin
-- [ ] Weighted strategies
-- [ ] Health-aware routing
-- [ ] Sticky sessions (and why to avoid them)
-- [ ] Horizontal scaling
-- [ ] Stateless services
+- [x] Client-side load balancing — Feign + LoadBalancer spread across `:8091` / `:8092`
+- [x] Server-side load balancing — N/A (intentional): deferred to Phase 05 Gateway entry + Phase 18 K8s Service
+- [x] Spring Cloud LoadBalancer — distribution observed on live order path
+- [x] Round robin — alternating instance ports under multi-POST load
+- [x] Weighted strategies — N/A (intentional): interview/reference via `docs/phases/phase-4/infographics/05-load-balancing-algorithms.png`; RoundRobin is the implemented policy
+- [x] Health-aware routing — Eureka eviction + LB candidate set; lag from lease/cache clocks
+- [x] Sticky sessions (and why to avoid them) — unnecessary because durable inventory state lives in `inventory_db`
+- [x] Horizontal scaling — two inventory JVMs on distinct ports
+- [x] Stateless services — stock in Postgres (`inventory_db`), not JVM memory (formalize in D)
 
 ### Hands-on
 
-- [ ] Run multiple `inventory-service` instances on distinct non-conflicting ports (for example `:8091`, `:8092`, `:8093`)
-- [ ] Demonstrate traffic distribution
-- [ ] Prove unhealthy instances are skipped
-- [ ] Confirm services stay stateless under scale
+- [x] Run multiple `inventory-service` instances on distinct non-conflicting ports (for example `:8091`, `:8092`, `:8093`)
+- [x] Demonstrate traffic distribution
+- [x] Prove unhealthy instances are skipped
+- [x] Confirm services stay stateless under scale — learner reproduced cross-instance state and restart persistence
 
-**Next slice:** A — launch two inventory-service instances with unique instance metadata, confirm both register in Eureka, and keep product/order ports unchanged.
+**Slice A evidence (2026-09-23):** Eureka reported both instances `UP`; shared DB reads matched.
 
-**Next:** Introduce a single real entry point.
+**Slice B evidence (2026-09-24):** Header stamp + four POSTs alternating ports; reactor green.
+
+**Slice C evidence (2026-09-24):** Demo leases/cache on inventory + order; hard-kill produced brief 503 while stale candidates remained, then steady 201 on survivor once Eureka/LB caught up. Root README documents `lsof` + `kill -9` exercise.
+
+**Slice D evidence (learner verified, 2026-09-24):** direct reads through `:8091` and `:8092` matched; mutations made through either instance were visible through the other; versioned inventory state remained correct across load-balanced orders and an inventory stop/restart. No sticky routing or JVM-local stock was added.
+
+**Phase 04 review (2026-09-25):** **PASS WITH NOTES.** Learning slices A–D complete; reactor `mvn test` green. Notes: treat `X-Instance-Port` as diagnostic/internal; Slice C demo clocks (5s/15s/5s) are classroom-shortened; algorithm zoo stays reference-only; infographic pack on disk is `00` + `05` (+ poster) — `01`–`04` PNGs optional/not present.
+
+**Phase 04 release checkpoint:** merged to `main` and tagged `phase-04-complete`.
+
+**Next:** Phase 05 Slice A — scaffold Spring Cloud Gateway as the sole client entry point (`lb://` routes).
 
 ---
 
@@ -695,6 +714,15 @@ spring:
 - [ ] Correlation IDs
 - [ ] Gateway observability
 
+### Slices
+
+| Slice | Goal | Status |
+|-------|------|--------|
+| **A** | Scaffold `api-gateway` module + Spring Cloud Gateway; route one path via `lb://order-service` | NEXT |
+| **B** | Route products + inventory; gateway becomes sole external entry | [ ] |
+| **C** | Correlation IDs + basic observability (logs/metrics) | [ ] |
+| **D** | CORS + rate-limit awareness (minimal working config) | [ ] |
+
 ### Hands-on
 
 - [ ] Add API Gateway as the only client entry point
@@ -702,6 +730,8 @@ spring:
 - [ ] Add correlation IDs
 - [ ] Configure CORS and rate limiting
 - [ ] Observe gateway metrics/logs
+
+**Next slice:** A — create `api-gateway` on `feature/phase-05-api-gateway` and prove one `lb://` route.
 
 **Next:** Centralize configuration.
 

@@ -38,3 +38,7 @@ eureka:
     # Local same-machine: advertise localhost, not the LAN IP.
     hostname: localhost
     prefer-ip-address: false
+    instance-id: ${spring.application.name}:${server.port}
+    lease-renewal-interval-in-seconds: 5      # heartbeat more often (default 30)
+    lease-expiration-duration-in-seconds: 15  # Eureka marks dead sooner (default 90)
+

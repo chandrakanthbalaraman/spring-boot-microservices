@@ -6,7 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "clients.product-service")
 public record ProductClientProperties(
-    String baseUrl,
     Duration connectTimeout,
     Duration readTimeout,
     int maxConnections,
