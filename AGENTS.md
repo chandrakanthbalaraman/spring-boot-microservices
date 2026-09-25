@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 04 — Slices A–B DONE · next Slice C: skip unhealthy inventory instances · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 04](https://trello.com/c/rpoeKcVA) In Progress**
+**Phase 05 — next Slice A: scaffold Spring Cloud Gateway as sole client entry · Phase 04 DONE (`phase-04-complete`) · Phase 03 DONE (`phase-03-complete`) · Trello [Phase 05](https://trello.com/c/HgPr4pjC) Backlog**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -219,4 +219,4 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
 - [x] `.cursor/{agents,skills,commands,rules}` symlink to `.claude/` (2026-08-26)
 - [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-23)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-23)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-25)

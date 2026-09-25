@@ -55,6 +55,8 @@ docs/phases/phase-{N}/{topic}/
 | [`phase-2/openfeign/`](./phase-2/openfeign/) | 2 | OpenFeign deep dive | **api-gateway** | shipped |
 | [`phase-2/restclient/`](./phase-2/restclient/) | 2 | RestClient factory + `onStatus` / `execute()` | api-gateway | **planned** — stub |
 | [`phase-3/discovery/`](./phase-3/discovery/) | 3 | Eureka teaching tool vs K8s DNS | **api-gateway** | shipped pack · phase folder planned |
+| [`phase-4/infographics/`](./phase-4/infographics/) | 4 | Client-side LB, round robin, health skip, stateless | technical explainer | shipped · Phase 04 DONE (review PASS) |
+| [`phase-4/load-balancing/`](./phase-4/load-balancing/) | 4 | Topic index + captions for LB pack | notes | shipped |
 
 ## Style families
 
@@ -70,5 +72,6 @@ docs/phases/phase-{N}/{topic}/
 |------|---------|-----------------|
 | Phase 2 clients / OpenFeign | RestClient, Feign, WebClient, 500ms/2s, ProblemDetail 503, localhost | Eureka, Gateway, Resilience4j, Kafka |
 | Phase 3 discovery | Eureka, `name` without `url`, client vs server discovery, K8s DNS contrast | Gateway as the lesson, Resilience4j, Kafka |
+| Phase 4 load balancing | Client-side LB, RoundRobin, health skip, anti-sticky / shared DB | Gateway as the lesson, Resilience4j, Kafka, Redis sessions |
 
 Posters: [`posters/`](./posters/). Parent checklist: [`sb-roadmap.md`](../../sb-roadmap.md).

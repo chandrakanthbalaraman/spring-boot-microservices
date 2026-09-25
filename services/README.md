@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 04 Slices A–B done — two inventory instances register and Feign/LoadBalancer spreads traffic (`X-Instance-Port`). Next: Slice C skip unhealthy instances. Phase 03 tagged `phase-03-complete`.
+**Current curriculum focus:** Phase 04 Slices A–D done — dual inventory instances, Feign distribution, unhealthy-instance convergence, and stateless/anti-sticky behavior are learner-verified. Next: Phase 04 review/merge/tag checkpoint before Phase 05 Gateway.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 3 notes: [`docs/phases/phase-3/`](../docs/phases/phase-3/)
 
@@ -162,6 +162,20 @@ Phase 04 Slice B runtime evidence (2026-09-24):
 - Review result: **PASS WITH NOTES**. The diagnostic header is suitable for this lesson but should not become an accidental public production contract; focused propagation tests remain follow-up work.
 - The complete four-module Maven reactor remained green.
 
+Phase 04 Slice C runtime evidence (learner verified, 2026-09-24):
+
+- Stopping/crashing `:8092` produced a temporary typed `503` while its stale registration remained selectable.
+- After Eureka and LoadBalancer converged, every successful order returned `201` with `X-Instance-Port: 8091`.
+- Restarting `:8092` restored distribution across both inventory ports.
+- Fresh `mvn clean test` completed successfully across all four modules; substantive automated tests remain open.
+
+Phase 04 Slice D runtime evidence (learner verified, 2026-09-24):
+
+- Direct reads through `:8091` and `:8092` returned the same inventory row.
+- Mutations through either instance were immediately visible through the other, including the incremented optimistic-lock version.
+- Load-balanced orders changed one shared stock value, and that state survived stopping and restarting an inventory instance.
+- No sticky routing, HTTP session, or JVM-local stock storage was introduced.
+
 ---
 
 ## Failure Scenarios
@@ -203,4 +217,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 04 — Load Balancing.** Slices A–B are verified. Next learning slice: stop or crash one inventory instance and measure when Eureka plus Spring Cloud LoadBalancer remove it from the candidate set.
+**Phase 04 — Load Balancing.** Slices A–D are verified. Next: review the Phase 04 branch, merge it to `main`, and tag `phase-04-complete` before Phase 05 Gateway.
