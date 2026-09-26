@@ -15,6 +15,11 @@
     <description>Phase 03 — Eureka registry (scaffold only; you implement)</description>
 
     <dependencies>
+        <!-- Servlet stack — required for Eureka dashboard; must not live on the parent (Gateway is WebFlux). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>

@@ -21,6 +21,7 @@
 
     <modules>
         <module>discovery-server</module>
+        <module>api-gateway</module>
         <module>product-service</module>
         <module>inventory-service</module>
         <module>order-service</module>
@@ -45,13 +46,9 @@
     </dependencyManagement>
 
     <!-- Inherited by every module. Keep this list to starters every service needs.
-         JPA and the Postgres driver live on product, inventory, and order only —
-         discovery-server has no database. -->
+         spring-boot-starter-web is NOT here — api-gateway is WebFlux and conflicts with MVC.
+         Servlet services declare web themselves. JPA/Postgres stay on product/inventory/order. -->
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
