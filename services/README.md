@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 05 Slices A–C are DONE — routes, correlation IDs, Gateway health, request logs, and metrics are verified. Next: Slice D CORS and rate-limit awareness. Phase 04 is tagged `phase-04-complete`.
+**Current curriculum focus:** Phase 05 is DONE and tagged `phase-05-complete`. Next: Phase 06 Configuration Management on `feature/phase-06-configuration`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -206,6 +206,14 @@ Phase 05 Slice C evidence (reviewed, 2026-09-25):
 - `mvn -pl api-gateway clean package -DskipTests` completed successfully; automated filter tests were intentionally deferred for this learning slice.
 - Review note: exception-based failures can complete the filter before the outer error handler assigns an HTTP status, so the completion log may show `status=null`.
 
+Phase 05 Slice D evidence (reviewed, 2026-09-26):
+
+- Fresh six-module `mvn clean test` completed with `BUILD SUCCESS`; Gateway resolved Caffeine `3.2.4` and Bucket4j core/Caffeine `8.14.0` without the servlet web starter.
+- Allowed-origin preflight returned `200` with CORS headers; an untrusted-origin preflight returned `403`.
+- Five immediate product requests returned `200`, `200`, `200`, `429`, `429`; `X-RateLimit-Remaining` counted down and rejected responses retained their correlation IDs.
+- Inventory remained isolated from the product limiter and returned `200` through `:8092`.
+- Close-out: `allowCredentials: false`; browser CORS headers exclude `X-Forwarded-*`; Gateway README/POM document Slice D.
+
 ---
 
 ## Failure Scenarios
@@ -234,7 +242,7 @@ Phase 05 Slice C evidence (reviewed, 2026-09-25):
 - [x] **Slice A break-it:** stop order-service, observe eventual Gateway `503`, restart, and prove recovery.
 - [x] **Slice B:** product/inventory routes, direct-vs-Gateway happy paths, product-outage `503`, route isolation, and recovery verified.
 - [x] **Slice C:** correlation IDs and basic Gateway health/logs/metrics verified; focused automated tests intentionally deferred.
-- [ ] **Slice D:** CORS and rate-limit awareness.
+- [x] **Slice D:** CORS + local Bucket4j rate-limit awareness; trust-policy and Gateway docs close-out done.
 
 ---
 
@@ -246,4 +254,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 05 — API Gateway.** Slices A–C are DONE. Next: Slice D CORS and rate-limit awareness; carry the stale Gateway wording and exception-log status notes as cleanup.
+**Phase 06 — Configuration Management.** Phase 05 is tagged `phase-05-complete`. Next: Config Server / twelve-factor config on `feature/phase-06-configuration`.

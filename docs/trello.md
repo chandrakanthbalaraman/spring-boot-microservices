@@ -21,8 +21,8 @@ Update Trello only when the human asks (or says “update all status”) — see
 | 02 Communication | Done | https://trello.com/c/Zkxt4CVl |
 | 03 Discovery | Done | https://trello.com/c/Ev616SIf |
 | 04 Load balancing | Done | https://trello.com/c/rpoeKcVA |
-| 05 Gateway | In Progress | https://trello.com/c/HgPr4pjC |
-| 06 Config | Backlog | https://trello.com/c/XZIlqMAX |
+| 05 Gateway | Done | https://trello.com/c/HgPr4pjC |
+| 06 Config | In Progress | https://trello.com/c/XZIlqMAX |
 | 07 Resilience | Backlog | https://trello.com/c/ncjQcKLb |
 | 08 Database | Backlog | https://trello.com/c/HTviCg1m |
 | 09 Saga | Backlog | https://trello.com/c/q7h2hFSe |

@@ -21,6 +21,12 @@ Phase 05 — Spring Cloud Gateway. Sole **external** entry for clients; service-
 - Structured access log: `gateway_request correlationId=… method=… path=… routeId=… status=… signal=… durationMs=…`
 - Actuator: `health`, `info`, `metrics` (Gateway WebFlux metrics enabled in YAML).
 
+## CORS + rate limiting (Slice D)
+
+- Global CORS (`/**`): allowlist origin via `GATEWAY_CORS_ALLOWED_ORIGIN` (default `http://localhost:3000`); `allowCredentials: false`.
+- Browser-allowed/exposed headers stay app-facing (`Content-Type`, `Authorization`, `X-Correlation-ID`, `Idempotency-Key`, rate-limit headers). `X-Forwarded-*` is not browser-facing here — proxies set those hop-by-hop.
+- Product route uses Gateway `RequestRateLimiter` with a local Caffeine/Bucket4j bucket (3 tokens / 10s per client IP). Single-instance only; Redis-backed limits come later.
+
 ```bash
 # From services/
 mvn spring-boot:run -pl api-gateway
@@ -33,4 +39,15 @@ curl -i http://localhost:8080/api/v1/orders/1
 curl -i -H 'X-Correlation-ID: demo-trace-1' http://localhost:8080/api/v1/products
 ```
 
-Out of scope here: CORS, rate limits, authn/authz (later phases). Automated filter tests intentionally deferred.
+CORS preflight / rate-limit smoke:
+
+```bash
+curl -i -X OPTIONS http://localhost:8080/api/v1/products \
+  -H 'Origin: http://localhost:3000' \
+  -H 'Access-Control-Request-Method: GET'
+
+# Burst product GETs — expect 200 then 429 once the local bucket empties
+for i in 1 2 3 4 5; do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8080/api/v1/products; done
+```
+
+Out of scope here: authn/authz and API versioning (later phases). Automated filter tests intentionally deferred.

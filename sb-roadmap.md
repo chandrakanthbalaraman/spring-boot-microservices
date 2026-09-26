@@ -118,8 +118,8 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 02 | Inter-Service Communication | on `main` via the Phase 03 merge | DONE (slices verified; `phase-02-complete` tag was not cut) |
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
-| 05 | API Gateway | `feature/phase-05-api-gateway` | PARTIAL — Slices A–C DONE; next Slice D CORS + rate-limit awareness |
-| 06 | Configuration Management | `feature/phase-06-configuration` | [ ] |
+| 05 | API Gateway | tag `phase-05-complete` | DONE (Slices A–D; local Bucket4j + narrowed CORS) |
+| 06 | Configuration Management | `feature/phase-06-configuration` | NEXT — Slice A |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
 | 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
@@ -709,9 +709,9 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 - [x] Filters
 - [ ] Authentication (gateway-level awareness)
 - [ ] Authorization (gateway-level awareness)
-- [ ] Rate limiting
+- [x] Rate limiting
 - [x] Request transformation
-- [ ] CORS
+- [x] CORS
 - [ ] API versioning
 - [x] Correlation IDs
 - [x] Gateway observability
@@ -723,14 +723,14 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 | **A** | Scaffold `api-gateway` module + Spring Cloud Gateway; route one path via `lb://order-service` | DONE — six-module reactor green; Gateway registered `UP`; proxied order `1` returned `200`; predicate miss returned `404`; learner observed no-instance `503` after Eureka convergence; recovered route independently rechecked at `200` after restart (2026-09-25) |
 | **B** | Route products + inventory; gateway becomes sole external entry | DONE — both `lb://` routes returned `200` with bodies matching direct calls; product outage showed stale-instance `500`, converged no-instance `503`, unaffected inventory `200`, then product recovery to `200`; six-module build green (2026-09-25). Non-blocking note: Gateway module descriptions still use stale Slice A/C wording |
 | **C** | Correlation IDs + basic observability (logs/metrics) | DONE — `GlobalFilter` preserves or generates `X-Correlation-ID`, forwards it and returns it; Actuator health returned `UP`; `spring.cloud.gateway.requests` exposed route/status metrics; Gateway packaged successfully (2026-09-25). Notes: automated filter tests intentionally deferred; exception-path completion logs may have `status=null` |
-| **D** | CORS + rate-limit awareness (minimal working config) | [ ] |
+| **D** | CORS + rate-limit awareness (minimal working config) | DONE — allowed preflight `200`, untrusted origin `403`, product burst `200/200/200/429/429`, inventory isolation `200`, correlation ID on `429`; CORS narrowed (`allowCredentials: false`, no browser `X-Forwarded-*`); Gateway README/POM refreshed; local Caffeine Bucket4j intentionally single-instance (2026-09-26) |
 
 ### Hands-on
 
 - [x] Add API Gateway as the intended client entry point
 - [x] Route `/api/orders/**`, products, inventory via `lb://`
 - [x] Add correlation IDs
-- [ ] Configure CORS and rate limiting
+- [x] Configure CORS and rate limiting
 - [x] Observe gateway metrics/logs
 
 **Slice A evidence (reviewed, 2026-09-25):** Eureka reported `API-GATEWAY` `UP` on `:8080`. `GET :8080/api/v1/orders/1` returned `200` matching direct `:8083`. Unconfigured product path returned Gateway `404`. With order-service stopped and Eureka converged, the matched route returned `503`; after restart it recovered to `200`.
@@ -739,9 +739,9 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 
 **Slice C evidence (reviewed, 2026-09-25):** `CorrelationIdFilter` preserves a valid `X-Correlation-ID` or generates a UUID, forwards it, and returns it. Actuator health was `UP`. `spring.cloud.gateway.requests` exposed route/status metrics. Gateway package build succeeded. Notes: automated filter tests deferred; a cancelled exchange can log before a status exists.
 
-**Next slice:** D — add minimal CORS configuration and rate-limit awareness; carry forward the stale Gateway wording and exception-log status notes.
+**Slice D evidence (reviewed, 2026-09-26):** Allowed-origin preflight `200`; untrusted origin `403`. Product burst `200/200/200/429/429` with rate-limit headers and retained correlation IDs; inventory stayed `200`. CORS: `allowCredentials: false`; app-facing headers only (no browser `X-Forwarded-*`). Gateway README/POM match Slice D. Local Caffeine limiter is single-instance by design.
 
-**Next:** Centralize configuration.
+**Next:** Phase 06 — Configuration Management (Config Server / twelve-factor).
 
 ---
 

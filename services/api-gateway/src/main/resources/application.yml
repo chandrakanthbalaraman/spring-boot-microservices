@@ -5,6 +5,36 @@ spring:
     gateway:
       server:
         webflux:
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - ${GATEWAY_CORS_ALLOWED_ORIGIN:http://localhost:3000}
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - OPTIONS
+                  - PATCH
+                allowedHeaders:
+                  - Content-Type
+                  - Authorization
+                  - X-Requested-With
+                  - X-Correlation-ID
+                  - Idempotency-Key
+                exposedHeaders:
+                  - Content-Type
+                  - Authorization
+                  - X-Requested-With
+                  - X-Correlation-ID
+                  - Idempotency-Key
+                  - X-RateLimit-Limit
+                  - X-RateLimit-Remaining
+                  - X-RateLimit-Reset
+                allowCredentials: false
+                max-age: 3600
           metrics:
             enabled: true
           routes:
@@ -18,11 +48,27 @@ spring:
               uri: lb://product-service
               predicates:
                 - Path=/api/v1/products/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    rate-limiter: "#{@bucket4jRateLimiter}"
+                    key-resolver: "#{@clientIpKeyResolver}"
+                    bucket4j-rate-limiter.capacity: 3
+                    bucket4j-rate-limiter.refillTokens: 3
+                    bucket4j-rate-limiter.refillPeriod: 10s
+                    bucket4j-rate-limiter.requestedTokens: 1
             # Slice B
             - id: inventory-service
               uri: lb://inventory-service
               predicates:
                 - Path=/api/v1/inventories/**
+
+# Caffeine store for Bucket4j (see RateLimitConfig). Override per env without code changes.
+gateway:
+  rate-limit:
+    cache:
+      maximum-size: 1000
+      keep-after-refill: 10m
 
 server:
   port: 8080
