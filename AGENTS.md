@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 06 — Configuration Management: next Slice A (Config Server scaffold) · Phase 05 DONE (`phase-05-complete`) · Phase 04 DONE (`phase-04-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
+**Phase 06 — Slice B DONE: product-service requires Config Server, loads central port `8081`, honors `SERVER_PORT`, and fails fast when Config Server is unavailable; carryover: align the Config Server README with the running filesystem/product setup; next: Slice C profiles, secrets boundary, and twelve-factor precedence · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -64,9 +64,10 @@ Update this line after every slice (e.g. `Phase 1: product-service REST + Postgr
 | `/docs/adr` | Architecture Decision Records — numbered; never delete, only supersede |
 | `/docs/architecture` | Per-phase architecture notes |
 | `/docs/notes` | Topic notes (resilience, kafka, k8s, …) |
-| `/.claude/` | AI platform (agents, skills, rules, memory, commands) — **edit here** |
-| `/.cursor/` | Cursor entry: `mcp.json` plus **symlinks into `.claude/`** |
-| `/AGENTS.md` | This brief |
+| `/.cursor/` | AI platform (agents, skills, rules, memory, commands) — **edit here**; also `mcp.json` + hooks |
+| `/.claude/` | Symlinks into `.cursor/` so Claude Code sees the same toolkit |
+| `/.agents/` | Symlinks into `.cursor/` so Codex sees the same toolkit (skills auto-load from `.agents/skills`) |
+| `/AGENTS.md` | This brief (Codex + Cursor + Claude Code) |
 | `/cursor.md` | Cursor overlay (learning contract + symlink map) |
 
 ---
@@ -99,9 +100,9 @@ Working services · how-to-run in the phase README · at least one failure exerc
 
 ---
 
-## `.claude/` — AI engineering platform
+## `.cursor/` — AI engineering platform
 
-Claude Code loads this tree. Cursor loads the **same** tree via symlinks (see `cursor.md`). **Slash commands only come from `commands/`**.
+Cursor owns this tree. Claude Code and Codex load the **same** files via symlinks under `.claude/` and `.agents/` (see `cursor.md`). **Slash commands only come from `commands/`**. Codex auto-discovers skills from `.agents/skills`.
 
 ### `agents/` — specialized personas
 
@@ -217,6 +218,6 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 ## Sync checklist
 
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
-- [x] `.cursor/{agents,skills,commands,rules}` symlink to `.claude/` (2026-08-26)
+- [x] `.cursor/` is the AI toolkit source of truth; `.claude/` and `.agents/` symlink into `.cursor/` (2026-09-26)
 - [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-23)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-25)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-26)

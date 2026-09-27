@@ -1,0 +1,71 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Product Service — dev",
+        "mainClass": "com.example.microservices.product.ProductServiceApplication",
+        "projectName": "product-service",
+        "cwd": "${workspaceFolder}/services/product-service",
+        "envFile": "${workspaceFolder}/.env",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Discovery Server",
+        "mainClass": "com.example.microservices.discovery.DiscoveryServerApplication",
+        "projectName": "discovery-server",
+        "cwd": "${workspaceFolder}/services/discovery-server",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Config Server",
+        "mainClass": "com.example.microservices.config.ConfigServerApplication",
+        "projectName": "config-server",
+        "cwd": "${workspaceFolder}/services/config-server",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "API Gateway",
+        "mainClass": "com.example.microservices.gateway.ApiGatewayApplication",
+        "projectName": "api-gateway",
+        "cwd": "${workspaceFolder}/services/api-gateway",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Order Service",
+        "mainClass": "com.example.microservices.order.OrderServiceApplication",
+        "projectName": "order-service",
+        "cwd": "${workspaceFolder}/services/order-service",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Inventory Service — 8091",
+        "mainClass": "com.example.microservices.inventory.InventoryServiceApplication",
+        "projectName": "inventory-service",
+        "cwd": "${workspaceFolder}/services/inventory-service",
+        "vmArgs": "-Dserver.port=8091",
+        "console": "integratedTerminal"
+      },
+      {
+        "type": "java",
+        "request": "launch",
+        "name": "Inventory Service — 8092",
+        "mainClass": "com.example.microservices.inventory.InventoryServiceApplication",
+        "projectName": "inventory-service",
+        "cwd": "${workspaceFolder}/services/inventory-service",
+        "vmArgs": "-Dserver.port=8092",
+        "console": "integratedTerminal"
+      }
+    ]
+  }

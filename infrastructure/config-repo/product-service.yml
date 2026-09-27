@@ -1,0 +1,5 @@
+server:
+  port: 8081
+
+learning:
+  service-message: product-specific-configuration

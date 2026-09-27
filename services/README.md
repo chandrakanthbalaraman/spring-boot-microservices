@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 05 is DONE and tagged `phase-05-complete`. Next: Phase 06 Configuration Management on `feature/phase-06-configuration`.
+**Current curriculum focus:** Phase 06 Slice B is DONE on `feature/phase-06-configuration` — product-service requires Config Server, loads central port `8081`, honors `SERVER_PORT`, and fails fast when the server is unavailable. Carryover: align the Config Server README with the filesystem/product setup. Next: Slice C profiles, secrets boundary, and twelve-factor precedence. Phase 05 is tagged `phase-05-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -150,7 +150,7 @@ Discovery adds no database changes. The three business services keep their exist
 
 ## Testing
 
-`mvn clean test` proves all six modules compile; there are no substantive automated tests yet. Runtime evidence remains part of each learning slice.
+`mvn clean test` proves all seven modules compile; there are no substantive automated tests yet. Runtime evidence remains part of each learning slice.
 
 Phase 04 Slice A runtime evidence (2026-09-23):
 
@@ -254,4 +254,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 06 — Configuration Management.** Phase 05 is tagged `phase-05-complete`. Next: Config Server / twelve-factor config on `feature/phase-06-configuration`.
+**Phase 06 — Configuration Management.** Slice B is DONE. Close the carried Slice A README mismatch, then continue with Slice C profiles, secrets boundary, and twelve-factor precedence.

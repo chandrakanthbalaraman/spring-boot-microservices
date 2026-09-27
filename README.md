@@ -4,7 +4,7 @@ Hands-on learning repo: **Microservices 101 → distributed systems → producti
 
 You already know Java and Spring Boot fundamentals. This repo is the engineering vehicle — one Git history, one **`services/`** tree, phases on branches/tags, same services evolved instead of thrown away.
 
-**You implement. AI plans, scaffolds, and reviews** via [`AGENTS.md`](./AGENTS.md), [`cursor.md`](./cursor.md), and [`.claude/`](./.claude/).
+**You implement. AI plans, scaffolds, and reviews** via [`AGENTS.md`](./AGENTS.md), [`cursor.md`](./cursor.md), and [`.cursor/`](./.cursor/).
 
 Full checklist: [`sb-roadmap.md`](./sb-roadmap.md).
 
@@ -34,7 +34,7 @@ Do **not** treat this README as the live progress board.
 |---------|------|
 | [`AGENTS.md`](./AGENTS.md) / [`CLAUDE.md`](./CLAUDE.md) | One-line **Current phase** |
 | [`sb-roadmap.md`](./sb-roadmap.md) | Phase-by-phase checklists |
-| [`.claude/memory/phase-progress.md`](./.claude/memory/phase-progress.md) | Dated DONE / PARTIAL log |
+| [`.cursor/memory/phase-progress.md`](./.cursor/memory/phase-progress.md) | Dated DONE / PARTIAL log |
 | [Trello board](https://trello.com/b/Cjb5ESUA/sb-ms-spring-boot-microservices) | Optional mirror — update only when asked |
 
 Refresh with `/sync-phase-status` after a phase slice.
@@ -54,6 +54,7 @@ spring-boot-microservices/          # this repo (folder: SB-MS)
 ├── docs/                           architecture / decisions / notes
 ├── shared/                         common-model, common-exception, common-util (later)
 ├── infrastructure/docker/          reusable Compose (Postgres first)
+├── scripts/dev-services.sh         start the stack in Cursor terminal tabs
 ├── services/                       product + inventory + order (evolves every phase)
 └── capstone/                       consolidated production architecture (late)
 ```
@@ -83,6 +84,66 @@ mvn spring-boot:run -pl inventory-service -Dspring-boot.run.jvmArguments="-Dserv
 
 ---
 
+## Scripts
+
+[`scripts/dev-services.sh`](./scripts/dev-services.sh) starts the local stack in **Cursor’s integrated terminal**, one tab per service. Those tabs stay in the editor, so the log is visible in chat. Run the commands from the repo root, from a Cursor terminal.
+
+```bash
+./scripts/dev-services.sh stop    # free ports held by an earlier run
+./scripts/dev-services.sh all     # check ports, print the start steps
+```
+
+Then start the tabs from the editor with `Ctrl+Shift+Cmd+S`, or `Cmd+Shift+P` → **Tasks: Run Task** → **SB-MS: start all**. A shell cannot create Cursor terminal tabs, so this last step is manual. The task lives in [`.vscode/tasks.json`](./.vscode/tasks.json). The next tab opens after the previous process is ready: Postgres healthy, then Eureka, then Config Server, then the apps. `all` adds the shortcut to your Cursor keybindings on first use.
+
+| Shortcut | Does |
+|----------|------|
+| `Ctrl+Shift+Cmd+S` | Run **SB-MS: start all** (this workspace only) |
+| `Cmd+Shift+P` → **Tasks: Run Task** | Pick any SB-MS task, for example **SB-MS: inventory-service :8092** or **SB-MS: stop all** |
+| `Cmd+Shift+P` → **Tasks: Terminate Task** | Stop one running task tab |
+| `Cmd+Shift+P` → **Tasks: Restart Running Task** | Restart one service tab |
+| ``Ctrl+` `` | Show or hide the terminal panel with the service tabs |
+
+| Tab | Command | Port |
+|-----|---------|------|
+| Postgres (three databases + pgAdmin) | `./scripts/dev-services.sh postgres` | `5433`, `5434`, `5435`, pgAdmin `5050` |
+| discovery-server | `./scripts/dev-services.sh discovery-server` | `8761` |
+| config-server | `./scripts/dev-services.sh config-server` | `8888` |
+| product-service | `./scripts/dev-services.sh product-service` | `8182` when `.env` sets `SPRING_PROFILES_ACTIVE=dev` (`8081` with no profile) |
+| inventory-service | `./scripts/dev-services.sh inventory-service 8091` | `8091` |
+| inventory-service | `./scripts/dev-services.sh inventory-service 8092` | `8092` |
+| order-service | `./scripts/dev-services.sh order-service` | `8083` |
+| api-gateway | `./scripts/dev-services.sh api-gateway` | `8080` |
+
+Run one command in the current terminal to restart that service only. `./scripts/dev-services.sh stop` sends SIGTERM to the app ports above, then `docker compose stop`. Postgres volumes stay. The matching task is **SB-MS: stop all**.
+
+`all` exits if any of those app ports is already listening. Stop the previous run first.
+
+`product-service` is the only command that loads the repo-root [`.env`](./.env) (`PRODUCT_DB_URL`, `PRODUCT_DB_USERNAME`, `PRODUCT_DB_PASSWORD`, `SPRING_PROFILES_ACTIVE`). That matches **Product Service — dev** in [`.vscode/launch.json`](./.vscode/launch.json). The other services keep the values in their own `application.yml`. Config Server stays on the `native` profile and reads `infrastructure/config-repo`.
+
+Inventory `8091` and `8092` are the Phase 04 load-balancer pair. The script passes `-Dserver.port`, which overrides `server.port: 8082` in `inventory-service`. Eureka’s `instance-id` includes that port, so both instances register.
+
+A debug launch and a script tab both bind the same port. Run each service in one place.
+
+```bash
+./scripts/dev-services.sh help
+```
+
+### Debug launches
+
+[`.vscode/launch.json`](./.vscode/launch.json) starts one JVM under the debugger and prints its log in an integrated terminal:
+
+| Launch name | Port |
+|-------------|------|
+| Discovery Server | `8761` |
+| Config Server | `8888` |
+| API Gateway | `8080` |
+| Product Service — dev | from `.env` / Config Server (`8182` on the `dev` profile) |
+| Order Service | `8083` |
+| Inventory Service — 8091 | `8091` |
+| Inventory Service — 8092 | `8092` |
+
+---
+
 Graceful shutdown sends a deregistration signal. A crash cannot, so Eureka must infer failure from missing heartbeats.
 First identify the exact :8092 process:
 
@@ -93,6 +154,10 @@ Confirm that the listed Java process is the inventory instance. Then replace 123
 
 ```bash
 kill -9 12345
+```
+
+```bash
+kill -9 $(lsof -t -i :PORT)
 ```
 ## How we learn
 
@@ -148,15 +213,15 @@ Later: Redis, Kafka, Prometheus, Grafana, Tempo/Jaeger.
 
 ## AI toolkit
 
-Source of truth is [`.claude/`](./.claude/). Cursor consumes the **same files** through symlinks under [`.cursor/`](./.cursor/) — edit `.claude/`, not the symlink copies.
+Source of truth is [`.cursor/`](./.cursor/). Claude Code and Codex consume the **same files** through symlinks under [`.claude/`](./.claude/) and [`.agents/`](./.agents/) — edit `.cursor/`, not the symlink copies.
 
 | Path | What |
 |------|------|
-| [`.claude/commands/`](./.claude/commands/) | Slash workflows (`/new-feature`, `/sync-phase-status`, …) |
-| [`.claude/skills/`](./.claude/skills/) | Repeatable procedures |
-| [`.claude/rules/`](./.claude/rules/) | Always-on constraints |
-| [`.claude/agents/`](./.claude/agents/) | Specialized personas |
-| [`.claude/memory/`](./.claude/memory/) | Durable decisions and progress |
+| [`.cursor/commands/`](./.cursor/commands/) | Slash workflows (`/new-feature`, `/sync-phase-status`, …) |
+| [`.cursor/skills/`](./.cursor/skills/) | Repeatable procedures (Codex: also via `.agents/skills`) |
+| [`.cursor/rules/`](./.cursor/rules/) | Always-on constraints |
+| [`.cursor/agents/`](./.cursor/agents/) | Specialized personas |
+| [`.cursor/memory/`](./.cursor/memory/) | Durable decisions and progress |
 
 Cursor overlay: [`cursor.md`](./cursor.md). Cross-tool brief: [`AGENTS.md`](./AGENTS.md).
 
@@ -167,7 +232,7 @@ Cursor overlay: [`cursor.md`](./cursor.md). Cross-tool brief: [`AGENTS.md`](./AG
 | “Start Phase 1” | Architecture + repo scaffold from `sb-roadmap.md` |
 | `/create-phase-branch` | `feature/phase-{N}-{slug}` |
 | `/sync-phase-status` | Honest Current phase + checklist |
-| “Review this PR” | `/review-pr` against `.claude/rules/` |
+| “Review this PR” | `/review-pr` against `.cursor/rules/` |
 
 ---
 
@@ -175,5 +240,5 @@ Cursor overlay: [`cursor.md`](./cursor.md). Cross-tool brief: [`AGENTS.md`](./AG
 
 - Roadmap: [`sb-roadmap.md`](./sb-roadmap.md)
 - Trello card map: [`docs/trello.md`](./docs/trello.md)
-- Decisions index: [`.claude/memory/decisions.md`](./.claude/memory/decisions.md)
-- Naming: [`.claude/memory/naming-conventions.md`](./.claude/memory/naming-conventions.md)
+- Decisions index: [`.cursor/memory/decisions.md`](./.cursor/memory/decisions.md)
+- Naming: [`.cursor/memory/naming-conventions.md`](./.cursor/memory/naming-conventions.md)

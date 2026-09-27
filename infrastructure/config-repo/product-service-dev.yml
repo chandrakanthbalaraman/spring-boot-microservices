@@ -1,0 +1,6 @@
+# product-service-dev.yml
+server:
+  port: 8182
+
+learning:
+  environment: development

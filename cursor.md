@@ -9,17 +9,41 @@ Do not duplicate status here. If this file and `AGENTS.md` disagree on **Current
 
 ---
 
-## Symlink map (edit `.claude/`, never the Cursor copies)
+## Symlink map (edit `.cursor/`, never the Claude/Codex copies)
 
-`.claude/` is the source of truth. `.cursor/` exposes the same toolkit so Cursor skills, commands, and agents stay in sync with Claude Code.
+`.cursor/` is the source of truth for the AI toolkit. `.claude/` and `.agents/` expose the same trees via symlinks so Claude Code and Codex stay in sync.
 
-| Cursor path | Points at |
+| Path | Role |
+|------|------|
+| `.cursor/agents` | **real** specialized personas |
+| `.cursor/skills` | **real** invokable procedures |
+| `.cursor/commands` | **real** slash commands |
+| `.cursor/rules` | **real** always-on constraints |
+| `.cursor/memory` | **real** durable project knowledge |
+| `.cursor/mcp.json` | Project MCP only (merged with `~/.cursor/mcp.json`; gitignored) |
+| `.cursor/hooks.json` | Cursor hooks (Jolli session-start / stop; gitignored) |
+| `.cursor/settings.local.json` | Claude Code local hooks (gitignored) |
+
+Claude Code aliases (symlinks into `.cursor/`):
+
+| Claude path | Points at |
 |-------------|-----------|
-| `.cursor/agents` | `.claude/agents` |
-| `.cursor/skills` | `.claude/skills` |
-| `.cursor/commands` | `.claude/commands` |
-| `.cursor/rules` | `.claude/rules` |
-| `.cursor/mcp.json` | **real file** (Cursor MCP only — not a symlink) |
+| `.claude/agents` | `.cursor/agents` |
+| `.claude/skills` | `.cursor/skills` |
+| `.claude/commands` | `.cursor/commands` |
+| `.claude/rules` | `.cursor/rules` |
+| `.claude/memory` | `.cursor/memory` |
+| `.claude/settings.local.json` | `.cursor/settings.local.json` |
+
+Codex aliases (symlinks into `.cursor/`):
+
+| Codex path | Points at |
+|------------|-----------|
+| `.agents/skills` | `.cursor/skills` (Codex **auto-discovers** repo skills here) |
+| `.agents/agents` | `.cursor/agents` |
+| `.agents/commands` | `.cursor/commands` |
+| `.agents/rules` | `.cursor/rules` |
+| `.agents/memory` | `.cursor/memory` |
 
 Root aliases:
 
@@ -28,18 +52,34 @@ Root aliases:
 | `CLAUDE.md` | `AGENTS.md` |
 | `AGENTS.md` | real file (Cursor / Codex). On macOS this **is** `agents.md` — do not add a second symlink |
 
-If you change an agent, skill, command, or rule, change it under **`.claude/`**. Recreating files under `.cursor/agents` (etc.) will either fail (symlink) or drift.
+If you change an agent, skill, command, rule, or memory file, change it under **`.cursor/`**. Recreating files under `.claude/` or `.agents/` will either fail (symlink) or drift.
+
+**MCP:** keep project servers in `.cursor/mcp.json` only. Cursor merges that file with `~/.cursor/mcp.json` at startup. Do not copy global servers (or their secrets) into the project file.
+
+**Codex:** project brief is root `AGENTS.md`. Skills load from `.agents/skills`. For rules/memory/agents/commands, open the matching path under `.agents/` (or ask Codex to follow `AGENTS.md` / those folders).
 
 To repair:
 
 ```bash
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-rm -rf .cursor/agents .cursor/skills .cursor/commands .cursor/rules
-ln -s ../.claude/agents    .cursor/agents
-ln -s ../.claude/skills    .cursor/skills
-ln -s ../.claude/commands  .cursor/commands
-ln -s ../.claude/rules     .cursor/rules
-# keep .cursor/mcp.json
+# Real trees live under .cursor — do not replace them with symlinks.
+rm -f .claude/agents .claude/skills .claude/commands .claude/rules .claude/memory .claude/settings.local.json
+ln -s ../.cursor/agents              .claude/agents
+ln -s ../.cursor/skills              .claude/skills
+ln -s ../.cursor/commands            .claude/commands
+ln -s ../.cursor/rules               .claude/rules
+ln -s ../.cursor/memory              .claude/memory
+ln -s ../.cursor/settings.local.json .claude/settings.local.json
+
+mkdir -p .agents
+rm -f .agents/agents .agents/skills .agents/commands .agents/rules .agents/memory
+ln -s ../.cursor/agents   .agents/agents
+ln -s ../.cursor/skills   .agents/skills
+ln -s ../.cursor/commands .agents/commands
+ln -s ../.cursor/rules    .agents/rules
+ln -s ../.cursor/memory   .agents/memory
+
+# keep .cursor/mcp.json and .cursor/hooks.json
 # Do NOT ln agents.md — APFS is case-insensitive and would overwrite AGENTS.md
 ln -sf AGENTS.md CLAUDE.md
 ```
@@ -54,7 +94,7 @@ ln -sf AGENTS.md CLAUDE.md
 |------------|--------------|
 | Teach WHY / WHAT / HOW for the current phase slice | IMPLEMENT under `services/` on the phase branch |
 | Create phase Maven shells, package dirs, README checklists | Run, break, debug |
-| Review **their** diffs against `.claude/rules/` | Fix failures |
+| Review **their** diffs against `.cursor/rules/` | Fix failures |
 | Wire Compose / Flyway **sketches** when asked | Own service behavior and tests |
 
 **Allowed agent writes by default:** `services/` scaffold, parent/child POMs, `package-info` / empty application class, README checklists, docs/ADR stubs, infrastructure Compose stubs.
@@ -75,13 +115,15 @@ Attach these instead of pasting the whole roadmap:
 |------|----------------|
 | @AGENTS.md | **Every** session (Current phase + constraints) |
 | @sb-roadmap.md | **Only** the current `Phase NN` section |
-| @.claude/memory/phase-progress.md | Status honesty |
-| @.claude/memory/decisions.md | Before structural advice |
-| @.claude/memory/naming-conventions.md | Before creating packages/files |
-| Matching @.claude/skills/{name}/SKILL.md | Repeatable procedure |
-| Matching @.claude/agents/{name}.md | Specialized persona |
+| @.cursor/memory/phase-progress.md | Status honesty |
+| @.cursor/memory/decisions.md | Before structural advice |
+| @.cursor/memory/naming-conventions.md | Before creating packages/files |
+| Matching @.cursor/skills/{name}/SKILL.md | Repeatable procedure |
+| Matching @.cursor/agents/{name}.md | Specialized persona |
 
-Slash commands: @.cursor/commands/ (symlinked from `.claude/commands/`).
+Slash commands: @.cursor/commands/.
+
+(`.claude/...` paths still resolve via symlinks if an older skill or note references them.)
 
 ---
 
@@ -119,7 +161,7 @@ Same names as Claude Code. Invoke as `/{name}` or in natural language.
 | `/new-feature` | Plan a capability inside the current phase |
 | `/create-phase-branch` | `feature/phase-{N}-{slug}` |
 | `/sync-phase-status` | Honest Current phase + roadmap checkboxes |
-| `/review-pr` | Review against `.claude/rules/` |
+| `/review-pr` | Review against `.cursor/rules/` |
 | `/migrate` | Flyway-only |
 | `/arch-review` / `/security-review` / `/performance-review` | Specialized review |
 | `/generate-phase-infographic` | Architecture PNG |

@@ -119,7 +119,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
 | 05 | API Gateway | tag `phase-05-complete` | DONE (Slices A–D; local Bucket4j + narrowed CORS) |
-| 06 | Configuration Management | `feature/phase-06-configuration` | NEXT — Slice A |
+| 06 | Configuration Management | `feature/phase-06-configuration` | PARTIAL — Slice B DONE; Slice A README close-out remains |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
 | 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
@@ -759,23 +759,34 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 
 ### Learn
 
-- [ ] Externalized configuration
+- [x] Externalized configuration
 - [ ] Spring profiles
-- [ ] Environment variables
+- [x] Environment variables
 - [ ] Secrets (do not commit them)
-- [ ] Spring Cloud Config
+- [x] Spring Cloud Config
 - [ ] Configuration refresh
-- [ ] Configuration hierarchy
+- [x] Configuration hierarchy
 - [ ] Twelve-factor application principles
 
 ### Hands-on
 
 - [ ] Externalize all environment-specific values
-- [ ] Add Config Server (or equivalent hierarchy)
+- [x] Add Config Server (or equivalent hierarchy)
 - [ ] Demonstrate refresh
 - [ ] Plan the later move of secrets to Kubernetes-native mechanisms
 
-**Next:** Intentionally create failures and survive them.
+### Slice progress
+
+| Slice | Scope | Status |
+|-------|-------|--------|
+| **A** | Config Server module, native filesystem repository, Environment API, shared vs application-specific hierarchy | PARTIAL — seven-module reactor green; Config Server health `UP`; product returned shared + product-specific values; inventory returned shared-only; learner stopped Config Server and verified it became unreachable. Close-out gap: README still describes `classpath:/config-repo` and `order-service.yml` (2026-09-26) |
+| **B** | Wire one Config Client; import central non-secret configuration; prove local/remote precedence and startup behavior | DONE — product-service has the Config Client dependency and required `configserver:` import; `server.port` is central; Config Server and product returned `UP`/HTTP 200 on `8081`; `SERVER_PORT=8181` overrode remote config and returned 200; an unreachable Config Server caused fail-fast startup (2026-09-26) |
+| **C** | Profiles + environment-variable overrides; separate configuration from secrets; apply twelve-factor hierarchy | MISSING |
+| **D** | Demonstrate configuration refresh and recovery; document later Kubernetes ConfigMap/Secret migration boundary | MISSING |
+
+**Next slice:** Close the carried Slice A README mismatch, then Slice C — profiles, environment-variable precedence, secrets boundary, and twelve-factor configuration.
+
+**Next phase:** Intentionally create failures and survive them.
 
 ---
 
