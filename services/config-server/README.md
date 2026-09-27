@@ -52,4 +52,4 @@ curl http://localhost:8888/product-service/prod
 - [x] Seed `infrastructure/config-repo/` (shared `application.yml` + `product-service` base and profile files)
 - [x] Probe `product-service/default` returns the repo files
 - [x] Break-it: stop the server, then start `product-service` and confirm it fails fast (`ConfigClientFailFastException`)
-- [ ] Break-it: request an unknown application name and inspect `propertySources`
+- [x] Break-it: request an unknown application name and inspect `propertySources` (shared `application.yml` only)

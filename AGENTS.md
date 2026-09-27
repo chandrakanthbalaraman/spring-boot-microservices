@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 06 — Slice C DONE: dev/prod Config Server profiles, environment precedence, and environment-only product DB credentials verified; carryovers: correct the Config Server README, launcher port handling, and toolkit source-of-truth metadata before Slice D · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
+**Phase 06 — Slices A–C DONE: Config Server, required product client, profiles, environment precedence, and secrets boundary verified; next: Slice D refresh/recovery and Kubernetes ConfigMap/Secret boundary · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 

@@ -119,7 +119,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
 | 05 | API Gateway | tag `phase-05-complete` | DONE (Slices A–D; local Bucket4j + narrowed CORS) |
-| 06 | Configuration Management | `feature/phase-06-configuration` | PARTIAL — Slices B–C DONE; Slice A README and launcher/toolkit cleanup remain |
+| 06 | Configuration Management | `feature/phase-06-configuration` | PARTIAL — Slices A–C DONE; next Slice D |
 | 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
 | 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
@@ -779,12 +779,12 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 
 | Slice | Scope | Status |
 |-------|-------|--------|
-| **A** | Config Server module, native filesystem repository, Environment API, shared vs application-specific hierarchy | PARTIAL — seven-module reactor green; Config Server health `UP`; product returned shared + product-specific values; inventory returned shared-only; learner stopped Config Server and verified it became unreachable. Close-out gap: README still describes `classpath:/config-repo` and `order-service.yml` (2026-09-26) |
+| **A** | Config Server module, native filesystem repository, Environment API, shared vs application-specific hierarchy | DONE — filesystem backend and hierarchy verified; Config Server health `UP`; product returned shared + product-specific sources; inventory returned shared-only; stop-server failure verified; unknown application returned only the shared source; module README matches the running setup (2026-09-27) |
 | **B** | Wire one Config Client; import central non-secret configuration; prove local/remote precedence and startup behavior | DONE — product-service has the Config Client dependency and required `configserver:` import; `server.port` is central; Config Server and product returned `UP`/HTTP 200 on `8081`; `SERVER_PORT=8181` overrode remote config and returned 200; an unreachable Config Server caused fail-fast startup (2026-09-26) |
 | **C** | Profiles + environment-variable overrides; separate configuration from secrets; apply twelve-factor hierarchy | DONE — Config Server returns ordered dev/prod → product → shared sources; dev runs on `8182`; prod remote `8183` was overridden with `SERVER_PORT=8281` and returned 200; product DB URL/username/password now come from ignored environment configuration; removing the password prevented startup; seven-module reactor green (2026-09-27) |
 | **D** | Demonstrate configuration refresh and recovery; document later Kubernetes ConfigMap/Secret migration boundary | MISSING |
 
-**Next slice:** Close the carried Config Server README mismatch, correct launcher profile/override port handling and toolkit source-of-truth metadata, then Slice D — refresh/recovery and the Kubernetes ConfigMap/Secret boundary.
+**Next slice:** Slice D — demonstrate configuration refresh and recovery, then document the Kubernetes ConfigMap/Secret migration boundary.
 
 **Next phase:** Intentionally create failures and survive them.
 
