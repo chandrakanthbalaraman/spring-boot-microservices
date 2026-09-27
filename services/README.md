@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 06 Slice B is DONE on `feature/phase-06-configuration` — product-service requires Config Server, loads central port `8081`, honors `SERVER_PORT`, and fails fast when the server is unavailable. Carryover: align the Config Server README with the filesystem/product setup. Next: Slice C profiles, secrets boundary, and twelve-factor precedence. Phase 05 is tagged `phase-05-complete`.
+**Current curriculum focus:** Phase 06 Slice C is DONE on `feature/phase-06-configuration` — dev/prod profiles, environment precedence, and environment-only product DB credentials are verified. Before Slice D, correct the Config Server README, launcher profile/override port handling, and toolkit source-of-truth metadata. Phase 05 is tagged `phase-05-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -254,4 +254,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 06 — Configuration Management.** Slice B is DONE. Close the carried Slice A README mismatch, then continue with Slice C profiles, secrets boundary, and twelve-factor precedence.
+**Phase 06 — Configuration Management.** Slice C is DONE. Close the README, launcher, and toolkit metadata findings before Slice D refresh/recovery work.

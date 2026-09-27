@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 06 — Slice B DONE: product-service requires Config Server, loads central port `8081`, honors `SERVER_PORT`, and fails fast when Config Server is unavailable; carryover: align the Config Server README with the running filesystem/product setup; next: Slice C profiles, secrets boundary, and twelve-factor precedence · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
+**Phase 06 — Slice C DONE: dev/prod Config Server profiles, environment precedence, and environment-only product DB credentials verified; carryovers: correct the Config Server README, launcher port handling, and toolkit source-of-truth metadata before Slice D · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 06](https://trello.com/c/XZIlqMAX) In Progress**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
@@ -220,4 +220,4 @@ Detail lives in `sb-roadmap.md`. Do not jump phases without updating **Current p
 - [x] `CLAUDE.md` symlinks to `AGENTS.md` (2026-08-26)
 - [x] `.cursor/` is the AI toolkit source of truth; `.claude/` and `.agents/` symlink into `.cursor/` (2026-09-26)
 - [x] Phase status updates go through `/sync-phase-status` once Phase 1 exists (2026-09-23)
-- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-26)
+- [x] Current phase line matches `sb-roadmap.md` master tracker (2026-09-27)

@@ -21,4 +21,4 @@ user-invocable: false
 - One Git repo + one runnable **`services/`** tree. Phases are **branches + tags**, not duplicate folders.
 - Database-per-service. One **services** Maven parent (not a repo-root reactor on day one).
 - If another rule, agent, or skill still says Orbit / `com.orbit` / Maven single-module monolith / “never package-by-feature”, follow **this rule and `AGENTS.md`**.
-- Edit `.claude/` only. `.cursor/{agents,skills,commands,rules}` are symlinks.
+- Edit `.cursor/` only. `.claude/` and `.agents/` symlink into `.cursor/` so Claude Code and Codex load the same toolkit.

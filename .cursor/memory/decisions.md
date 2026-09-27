@@ -23,9 +23,10 @@ Orbit entries below are **historical copies from the toolkit scaffold**. They do
 
 ## Entries (SB-MS)
 
+- 2026-09-26 | — | **`.cursor/` is the AI toolkit source of truth.** `.claude/` and `.agents/` symlink into `.cursor/` (Claude Code and Codex see the same files). Supersedes the 2026-08-25 `.claude/`-canonical entry.
 - 2026-09-21 | — | **Branch-based phases:** one runnable tree [`services/`]; `feature/phase-{NN}-{slug}` + tags `phase-{NN}-complete`. Supersedes per-phase folders (`phase-01-*`, `phase-02-*`, …).
 - 2026-08-25 | — | One Git repo; do not create all 25 phase snapshots up front (now: one `services/` tree + Git).
-- 2026-08-25 | — | `.claude/` is source of truth; `.cursor/{agents,skills,commands,rules}` and `CLAUDE.md` are symlinks. Canonical brief: `AGENTS.md` (same path as `agents.md` on macOS).
+- 2026-08-25 | — | **Superseded 2026-09-26** — `.claude/` is source of truth; `.cursor/{agents,skills,commands,rules}` and `CLAUDE.md` are symlinks. Canonical brief: `AGENTS.md` (same path as `agents.md` on macOS).
 - 2026-08-25 | — | Microservices from Phase 1 (product, inventory, order) — not a layered monolith first.
 - 2026-08-25 | — | Database-per-service. Maven per phase. Package-by-layer per service first; package-by-feature later if earned.
 - 2026-08-25 | — | Curriculum: `sb-roadmap.md`. Learning loop: run → break → debug. Do not dump a whole phase unsupervised.

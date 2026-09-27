@@ -9,7 +9,7 @@
 #   ./scripts/dev-services.sh discovery-server
 #   ./scripts/dev-services.sh inventory-service 8091
 #
-# Stop JVMs and pause the Postgres containers (volumes are kept):
+# Stop SB-MS JVMs and pause the Postgres containers (volumes are kept):
 #   ./scripts/dev-services.sh stop
 
 set -euo pipefail
@@ -33,7 +33,7 @@ Usage: ./scripts/dev-services.sh <command>
   product-service          loads repo-root .env (same file as the debug launch)
   inventory-service 8091   load-balancer instance A
   inventory-service 8092   load-balancer instance B
-  stop                     SIGTERM app ports, then docker compose stop
+  stop                     SIGTERM SB-MS JVMs only, then docker compose stop
 
 Same Cursor tabs: Tasks: Run Task → SB-MS: start all
 Each tab runs this script once, so the log stays in the editor chat context.
@@ -178,16 +178,41 @@ cmd_order() {
   run_module order-service
 }
 
+# Mirrors Spring precedence for product-service: SERVER_PORT, then the last
+# active profile file in the config repo that sets server.port, then the base file.
+product_port() {
+  if [[ -n "${SERVER_PORT:-}" ]]; then
+    echo "${SERVER_PORT}"
+    return
+  fi
+  local repo="${ROOT}/infrastructure/config-repo"
+  local port profile candidate profiles="${SPRING_PROFILES_ACTIVE:-}"
+  port="$(yaml_server_port "${repo}/product-service.yml")"
+  for profile in ${profiles//,/ }; do
+    candidate="$(yaml_server_port "${repo}/product-service-${profile}.yml")"
+    if [[ -n "${candidate}" ]]; then
+      port="${candidate}"
+    fi
+  done
+  echo "${port:-8080}"
+}
+
+yaml_server_port() {
+  [[ -f "$1" ]] || return 0
+  awk '
+    /^server:/ { in_server = 1; next }
+    /^[^[:space:]#]/ { in_server = 0 }
+    in_server && /^[[:space:]]+port:/ { sub(/^[[:space:]]+port:[[:space:]]*/, ""); sub(/[[:space:]#].*$/, ""); print; exit }
+  ' "$1"
+}
+
 cmd_product() {
   set_title "product-service"
   load_product_env
-  local profile="${SPRING_PROFILES_ACTIVE:-}"
-  local port="8081"
-  if [[ "${profile}" == "dev" ]]; then
-    port="8182"
-  fi
+  local port
+  port="$(product_port)"
   echo "SB-MS starting product-service"
-  echo "SB-MS product env: ${ROOT}/.env  profile=${profile:-<unset>}  expected port ${port}"
+  echo "SB-MS product env: ${ROOT}/.env  profile=${SPRING_PROFILES_ACTIVE:-<unset>}  SERVER_PORT=${SERVER_PORT:-<unset>}  expected port ${port}"
   assert_port_free "${port}" "product-service"
   run_module product-service
 }
@@ -205,15 +230,21 @@ cmd_inventory() {
   run_module inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=${port}"
 }
 
+# Only JVMs whose command line names an SB-MS main class. Ports are not proof of
+# ownership: another app can listen on 8080 or 8081.
+sbms_pids() {
+  pgrep -f 'com\.example\.microservices\.[a-z]+\.[A-Za-z]+Application' || true
+}
+
 cmd_stop() {
-  local port pids
-  for port in 8761 8888 8080 8081 8182 8082 8083 8091 8092; do
-    pids="$(lsof -t -nP -iTCP:"${port}" -sTCP:LISTEN 2>/dev/null || true)"
-    if [[ -n "${pids}" ]]; then
-      echo "SB-MS stopping port ${port} (pid ${pids//$'\n'/ })"
-      # shellcheck disable=SC2086
-      kill ${pids} || true
-    fi
+  local pid pids
+  pids="$(sbms_pids)"
+  if [[ -z "${pids}" ]]; then
+    echo "SB-MS no service JVMs running"
+  fi
+  for pid in ${pids}; do
+    echo "SB-MS stopping pid ${pid}: $(ps -o command= -p "${pid}" | grep -oE 'com\.example\.microservices\.[a-z]+\.[A-Za-z]+Application' | head -n 1)"
+    kill "${pid}" || true
   done
   if command -v docker >/dev/null 2>&1; then
     echo "SB-MS stopping Postgres containers (data volumes stay)"
@@ -222,8 +253,13 @@ cmd_stop() {
 }
 
 cmd_all() {
-  local port busy=0
-  for port in 8761 8888 8080 8081 8182 8082 8083 8091 8092; do
+  local port busy=0 product
+  if [[ -f "${ROOT}/.env" ]]; then
+    product="$(set -a; source "${ROOT}/.env"; set +a; product_port)"
+  else
+    product="$(product_port)"
+  fi
+  for port in 8761 8888 8080 "${product}" 8083 8091 8092; do
     if lsof -nP -iTCP:"${port}" -sTCP:LISTEN >/dev/null 2>&1; then
       echo "SB-MS port ${port} is already in use." >&2
       busy=1

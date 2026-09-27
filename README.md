@@ -108,13 +108,13 @@ Then start the tabs from the editor with `Ctrl+Shift+Cmd+S`, or `Cmd+Shift+P` â†
 | Postgres (three databases + pgAdmin) | `./scripts/dev-services.sh postgres` | `5433`, `5434`, `5435`, pgAdmin `5050` |
 | discovery-server | `./scripts/dev-services.sh discovery-server` | `8761` |
 | config-server | `./scripts/dev-services.sh config-server` | `8888` |
-| product-service | `./scripts/dev-services.sh product-service` | `8182` when `.env` sets `SPRING_PROFILES_ACTIVE=dev` (`8081` with no profile) |
+| product-service | `./scripts/dev-services.sh product-service` | `SERVER_PORT` if set, else the config repo: `8182` for `dev`, `8183` for `prod`, `8081` with no profile |
 | inventory-service | `./scripts/dev-services.sh inventory-service 8091` | `8091` |
 | inventory-service | `./scripts/dev-services.sh inventory-service 8092` | `8092` |
 | order-service | `./scripts/dev-services.sh order-service` | `8083` |
 | api-gateway | `./scripts/dev-services.sh api-gateway` | `8080` |
 
-Run one command in the current terminal to restart that service only. `./scripts/dev-services.sh stop` sends SIGTERM to the app ports above, then `docker compose stop`. Postgres volumes stay. The matching task is **SB-MS: stop all**.
+Run one command in the current terminal to restart that service only. `./scripts/dev-services.sh stop` sends SIGTERM only to JVMs whose command line names an SB-MS main class (`com.example.microservices.*Application`), then runs `docker compose stop`. Other apps on the same ports are left alone. Postgres volumes stay. The matching task is **SB-MS: stop all**.
 
 `all` exits if any of those app ports is already listening. Stop the previous run first.
 
