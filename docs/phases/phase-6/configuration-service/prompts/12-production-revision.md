@@ -1,0 +1,4 @@
+# Slide 12
+
+Create a 1:1 square SB-MS interview-notebook quick-revision slide titled “PRODUCTION CONFIGURATION — QUICK REVISION”. Nine numbered compact cards: 1 Build once; configure at runtime. 2 Shared < service < profile < environment. 3 Git stores non-secrets. 4 Secret managers store credentials and keys. 5 Base64 is not encryption. 6 Prefer workload identity. 7 Mount or sync deliberately. 8 Test refresh, rotation and rollback. 9 Audit access and enforce least privilege. Include mini comparison matrix columns: Pattern, Secret in etcd?, Rotation path, Best fit. Rows: Native Secret—Yes—rollout/reload—simple cluster; ESO—Yes—provider sync—portable integrations; CSI—No by default—mount refresh—file consumers; Sealed Secret—Yes after decrypt—GitOps apply—encrypted Git workflow. Footer: “12/12 · SAVE BEFORE YOUR INTERVIEW”.
+

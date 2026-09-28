@@ -1,0 +1,6 @@
+# product-service-prod.yml
+server:
+  port: 8183
+
+learning:
+  environment: production

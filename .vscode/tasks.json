@@ -1,0 +1,245 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "SB-MS: start all",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "SB-MS: postgres",
+        "SB-MS: discovery-server",
+        "SB-MS: config-server",
+        "SB-MS: product-service",
+        "SB-MS: inventory-service :8091",
+        "SB-MS: inventory-service :8092",
+        "SB-MS: order-service",
+        "SB-MS: api-gateway"
+      ],
+      "problemMatcher": [],
+      "detail": "One Cursor terminal tab per service. Postgres, then Eureka, then Config Server, then the apps."
+    },
+    {
+      "label": "SB-MS: postgres",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "postgres"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-postgres",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": false,
+          "beginsPattern": "SB-MS postgres starting",
+          "endsPattern": "SB-MS postgres ready"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: discovery-server",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "discovery-server"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-discovery",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": false,
+          "beginsPattern": "SB-MS starting discovery-server",
+          "endsPattern": "Started DiscoveryServerApplication|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: config-server",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "config-server"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-config",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": false,
+          "beginsPattern": "SB-MS starting config-server",
+          "endsPattern": "Started ConfigServerApplication|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: product-service",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "product-service"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-product",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "SB-MS starting product-service",
+          "endsPattern": "Started ProductServiceApplication|APPLICATION FAILED TO START|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: inventory-service :8091",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "inventory-service", "8091"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-inventory-8091",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "SB-MS starting inventory-service",
+          "endsPattern": "Started InventoryServiceApplication|APPLICATION FAILED TO START|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: inventory-service :8092",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "inventory-service", "8092"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-inventory-8092",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "SB-MS starting inventory-service",
+          "endsPattern": "Started InventoryServiceApplication|APPLICATION FAILED TO START|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: order-service",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "order-service"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-order",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "SB-MS starting order-service",
+          "endsPattern": "Started OrderServiceApplication|APPLICATION FAILED TO START|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: api-gateway",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "api-gateway"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "sb-ms-gateway",
+        "pattern": { "regexp": "^SB-MS problem: (.*)$", "message": 1 },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "SB-MS starting api-gateway",
+          "endsPattern": "Started ApiGatewayApplication|APPLICATION FAILED TO START|port .* is already in use"
+        }
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "SB-MS: stop all",
+      "type": "shell",
+      "command": "bash",
+      "args": ["./scripts/dev-services.sh", "stop"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "dedicated",
+        "showReuseMessage": false,
+        "clear": true
+      }
+    }
+  ]
+}

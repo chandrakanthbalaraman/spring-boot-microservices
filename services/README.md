@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 05 is DONE and tagged `phase-05-complete`. Next: Phase 06 Configuration Management on `feature/phase-06-configuration`.
+**Current curriculum focus:** Phase 06 is DONE on tag `phase-06-complete` — Config Server, product Config Client, dev/prod profiles, environment precedence, secrets boundary, and refresh/recovery. Concrete Kubernetes ConfigMap/Secret work stays in Phase 18. Next: Phase 07 Slice A. Phase 05 is tagged `phase-05-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -150,7 +150,7 @@ Discovery adds no database changes. The three business services keep their exist
 
 ## Testing
 
-`mvn clean test` proves all six modules compile; there are no substantive automated tests yet. Runtime evidence remains part of each learning slice.
+`mvn clean test` proves all seven modules compile; there are no substantive automated tests yet. Runtime evidence remains part of each learning slice.
 
 Phase 04 Slice A runtime evidence (2026-09-23):
 
@@ -254,4 +254,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 06 — Configuration Management.** Phase 05 is tagged `phase-05-complete`. Next: Config Server / twelve-factor config on `feature/phase-06-configuration`.
+**Phase 07 — Resilience Engineering.** Next slice: create failures on purpose (timeout, retry, circuit breaker). Phase 06 is complete on tag `phase-06-complete`. Kubernetes ConfigMap/Secret implementation remains in Phase 18.

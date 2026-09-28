@@ -17,6 +17,7 @@ __pycache__/
 .vscode/*
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/tasks.json
 
 # Secrets and machine-local Spring config
 .env
@@ -31,6 +32,7 @@ logs/
 # Cursor / Claude / local MCP caches
 .cursor/*.log
 .cursor/mcp.json
-.claude/settings.local.json
+.cursor/hooks.json
+.cursor/settings.local.json
 .gemini/
 .jolli/

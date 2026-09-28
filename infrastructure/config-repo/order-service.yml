@@ -1,0 +1,4 @@
+# infrastructure/config-repo/order-service.yml
+
+learning:
+  service-message: order-specific-configuration

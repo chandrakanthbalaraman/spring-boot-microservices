@@ -1,0 +1,4 @@
+# Slide 09
+
+Create a 1:1 square SB-MS interview-notebook production architecture slide titled “KUBERNETES PRODUCTION PATTERNS”. Four cards. 1 “External Secrets Operator”: provider → operator → native Kubernetes Secret → Pod; broad compatibility, but secret lands in etcd. 2 “Secrets Store CSI Driver”: provider → CSI ephemeral mounted files → Pod; avoids native Secret by default, but application reads files and driver availability matters. 3 “Sealed Secrets”: encrypted `SealedSecret` in Git → cluster controller → native Secret; GitOps friendly, but controller key backup and rotation are critical. 4 “Workload Identity”: service account → short-lived cloud identity → provider; avoids static cloud keys. Bottom security rail: encryption at rest + least-privilege RBAC + namespace isolation + audit. Footer: “9/12 · REAL-WORLD KUBERNETES”.
+
