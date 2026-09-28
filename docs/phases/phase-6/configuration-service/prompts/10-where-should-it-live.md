@@ -1,0 +1,4 @@
+# Slide 10
+
+Create a 1:1 square SB-MS interview-notebook decision-tree slide titled “WHERE SHOULD THIS VALUE LIVE?” Start diamond: “Sensitive if disclosed?” No → “Environment-specific?” No → code/default; Yes → “Needs shared version history?” Yes → Config Git; runtime-only → environment variable or Kubernetes ConfigMap. Sensitive path → “Running in production Kubernetes?” No/local → ignored `.env` only for development. Yes → “External secret manager available?” Yes → Vault or AWS Secrets Manager via ESO/CSI and workload identity. No → protected Kubernetes Secret with encryption at rest and RBAC. Separate GitOps branch: encrypted SealedSecret, never plaintext Secret YAML. Bottom examples: port→ConfigMap; log level→Config Git; DB password→secret manager; TLS key→secret manager/CSI. Footer: “10/12 · PLACEMENT DECISION TREE”.
+

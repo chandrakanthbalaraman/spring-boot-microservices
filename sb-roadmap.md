@@ -119,8 +119,8 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 03 | Service Discovery | tag `phase-03-complete` | DONE (Slices A–D; Slice E deferred to Phase 18) |
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
 | 05 | API Gateway | tag `phase-05-complete` | DONE (Slices A–D; local Bucket4j + narrowed CORS) |
-| 06 | Configuration Management | `feature/phase-06-configuration` | PARTIAL — Slices A–C DONE; next Slice D |
-| 07 | Resilience Engineering | `feature/phase-07-resilience` | [ ] |
+| 06 | Configuration Management | tag `phase-06-complete` | DONE (Slices A–D; refresh verified; ConfigMap/Secret deferred to Phase 18) |
+| 07 | Resilience Engineering | `feature/phase-07-resilience` | NEXT — Slice A |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
 | 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
 | 10 | Kafka & Event-Driven Architecture | `feature/phase-10-kafka` | [ ] |
@@ -764,16 +764,16 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 - [x] Environment variables
 - [x] Secrets (do not commit them)
 - [x] Spring Cloud Config
-- [ ] Configuration refresh
+- [x] Configuration refresh
 - [x] Configuration hierarchy
 - [x] Twelve-factor application principles
 
 ### Hands-on
 
-- [ ] Externalize all environment-specific values
+- [ ] Externalize all environment-specific values — product-service only in this phase (the one Config Client). Order, inventory, gateway, and discovery still use local files
 - [x] Add Config Server (or equivalent hierarchy)
-- [ ] Demonstrate refresh
-- [ ] Plan the later move of secrets to Kubernetes-native mechanisms
+- [x] Demonstrate refresh
+- [x] Plan the later move of secrets to Kubernetes-native mechanisms — N/A (intentional) for implementation here; concrete ConfigMap/Secret work is deferred to Phase 18
 
 ### Slice progress
 
@@ -782,9 +782,11 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 | **A** | Config Server module, native filesystem repository, Environment API, shared vs application-specific hierarchy | DONE — filesystem backend and hierarchy verified; Config Server health `UP`; product returned shared + product-specific sources; inventory returned shared-only; stop-server failure verified; unknown application returned only the shared source; module README matches the running setup (2026-09-27) |
 | **B** | Wire one Config Client; import central non-secret configuration; prove local/remote precedence and startup behavior | DONE — product-service has the Config Client dependency and required `configserver:` import; `server.port` is central; Config Server and product returned `UP`/HTTP 200 on `8081`; `SERVER_PORT=8181` overrode remote config and returned 200; an unreachable Config Server caused fail-fast startup (2026-09-26) |
 | **C** | Profiles + environment-variable overrides; separate configuration from secrets; apply twelve-factor hierarchy | DONE — Config Server returns ordered dev/prod → product → shared sources; dev runs on `8182`; prod remote `8183` was overridden with `SERVER_PORT=8281` and returned 200; product DB URL/username/password now come from ignored environment configuration; removing the password prevented startup; seven-module reactor green (2026-09-27) |
-| **D** | Demonstrate configuration refresh and recovery; document later Kubernetes ConfigMap/Secret migration boundary | MISSING |
+| **D** | Demonstrate configuration refresh and recovery; defer concrete Kubernetes ConfigMap/Secret work to Phase 18 | DONE — refresh-scoped `learning.service-message` is visible through Actuator info; isolated outage test retained the current value and product API HTTP 200 while refresh returned 500; after Config Server restart, refresh returned 200 and the API remained healthy; seven-module reactor green (2026-09-27) |
 
-**Next slice:** Slice D — demonstrate configuration refresh and recovery, then document the Kubernetes ConfigMap/Secret migration boundary.
+**Slice D evidence (reviewed, 2026-09-27):** `LearningConfigProperties` binds the central non-secret learning value under `@RefreshScope`; the info contributor exposes it for observation. With isolated Config Server `:18888` stopped, the running product instance retained `product-specific-refreshed` and `/api/v1/products` stayed HTTP 200 while `POST /actuator/refresh` returned 500. Restarting Config Server restored refresh to HTTP 200 (`[]`) and the product API remained 200. Fresh seven-module `mvn clean test` passed. Review note: `/actuator/refresh` is an unauthenticated mutating endpoint for this local lesson only and must not be exposed unchanged in a deployed environment. Concrete Kubernetes configuration belongs to Phase 18.
+
+**Next:** Phase 07 — Resilience Engineering (Slice A).
 
 **Next phase:** Intentionally create failures and survive them.
 

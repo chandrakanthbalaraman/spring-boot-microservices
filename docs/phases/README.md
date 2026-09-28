@@ -58,6 +58,8 @@ docs/phases/phase-{N}/{topic}/
 | [`phase-4/infographics/`](./phase-4/infographics/) | 4 | Client-side LB, round robin, health skip, stateless | technical explainer | shipped · Phase 04 DONE (review PASS) |
 | [`phase-4/load-balancing/`](./phase-4/load-balancing/) | 4 | Topic index + captions for LB pack | notes | shipped |
 | [`phase-5/infographics/`](./phase-5/infographics/) | 5 | Gateway routes, correlation id, health/logs/metrics | technical explainer | shipped · Slices A–C; next Slice D |
+| [`phase-6/infographics/`](./phase-6/infographics/) | 6 | Config Server, precedence, refresh | technical explainer | shipped · Phase 06 DONE |
+| [`phase-6/configuration-service/`](./phase-6/configuration-service/) | 6 | Central config, secrets boundary, refresh/recovery | carousel | shipped · Phase 06 DONE |
 
 ## Style families
 

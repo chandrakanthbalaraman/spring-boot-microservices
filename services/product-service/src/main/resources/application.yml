@@ -40,3 +40,8 @@ eureka:
     # prefer-ip-address:true made Feign call 192.168.1.234 → Tomcat SocketException.
     hostname: localhost
     prefer-ip-address: false
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh

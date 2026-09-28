@@ -2,4 +2,4 @@ server:
   port: 8081
 
 learning:
-  service-message: product-specific-configuration
+  service-message: product-specific-refreshed
