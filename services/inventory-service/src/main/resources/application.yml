@@ -42,3 +42,6 @@ eureka:
     lease-renewal-interval-in-seconds: 5      # heartbeat more often (default 30)
     lease-expiration-duration-in-seconds: 15  # Eureka marks dead sooner (default 90)
 
+learning:
+  resilience:
+    inventory-get-delay: ${INVENTORY_GET_DELAY:0ms}

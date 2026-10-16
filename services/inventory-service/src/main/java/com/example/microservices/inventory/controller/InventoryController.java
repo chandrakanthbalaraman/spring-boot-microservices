@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.microservices.inventory.component.InventoryDelaySimulator;
 import com.example.microservices.inventory.dto.InventoryCreateRequest;
 import com.example.microservices.inventory.dto.InventoryResponse;
 import com.example.microservices.inventory.service.InventoryService;
@@ -22,7 +23,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class InventoryController {
     private final InventoryService inventoryService;
-
+    private final InventoryDelaySimulator inventoryDelaySimulator;
+    
     @PostMapping
     public ResponseEntity<InventoryResponse> createInventory( @Valid @RequestBody InventoryCreateRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(inventoryService.createInventory(request));
@@ -30,6 +32,7 @@ public class InventoryController {
 
     @GetMapping("/{productId}")
     public ResponseEntity<InventoryResponse> getInventoryByProductId(@PathVariable Long productId) {
+        inventoryDelaySimulator.beforeInventoryRead();
         return ResponseEntity.ok(inventoryService.getInventoryByProductId(productId));
     }
     

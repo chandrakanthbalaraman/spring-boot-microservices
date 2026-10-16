@@ -23,9 +23,12 @@ public class InventoryFeignClient implements InventoryClient {
     @Override
     public InventoryResponse getInventoryByProductId(Long productId) {
         try {
-            return body(inventoryFeignApi.getInventoryByProductId(productId));
+            ResponseEntity<InventoryResponse> response =
+                inventoryFeignApi.getInventoryByProductId(productId);
+
+            return response.getBody();
         } catch (RetryableException e) {
-            throw new DownstreamServiceUnavailableException("inventory-service", e.getMessage(), e);
+            throw new DownstreamServiceUnavailableException("inventory-service", "inventory-service unavailable", e);
         }
     }
 

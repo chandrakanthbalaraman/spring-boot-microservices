@@ -2,7 +2,7 @@
 
 Single code tree for the whole roadmap. **Phases are Git branches and tags**, not separate folders — replay Phase 1 with `git checkout phase-01-complete` when tagged.
 
-**Current curriculum focus:** Phase 06 is DONE on tag `phase-06-complete` — Config Server, product Config Client, dev/prod profiles, environment precedence, secrets boundary, and refresh/recovery. Concrete Kubernetes ConfigMap/Secret work stays in Phase 18. Next: Phase 07 Slice A. Phase 05 is tagged `phase-05-complete`.
+**Current curriculum focus:** Phase 07 Slice A is DONE on `feature/phase-07-resilience` — the read-only availability TimeLimiter, stable typed `503`, and recovery after Eureka convergence are runtime-verified. Next is Slice B retry/backoff classification. Focused tests and whitespace cleanup were explicitly deferred by the learner. Phase 06 is tagged `phase-06-complete`.
 
 Parent checklist: [`sb-roadmap.md`](../sb-roadmap.md) · Phase 4 notes: [`docs/phases/phase-4/`](../docs/phases/phase-4/)
 
@@ -254,4 +254,4 @@ Load balancing (4) · gateway (5) · Resilience4j retry/CB (7) · saga (9) · Ka
 
 ## Next Phase
 
-**Phase 07 — Resilience Engineering.** Next slice: create failures on purpose (timeout, retry, circuit breaker). Phase 06 is complete on tag `phase-06-complete`. Kubernetes ConfigMap/Secret implementation remains in Phase 18.
+**Phase 07 — Resilience Engineering.** Slice A is DONE: timeout/fail-fast behavior, the stable public `503` contract, OpenAPI `503` documentation, and recovery after Eureka convergence are verified. Focused tests and whitespace cleanup are deferred; next is Slice B retry/backoff classification.

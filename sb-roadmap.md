@@ -120,7 +120,7 @@ Optional Trello mirror: [SB-MS board](https://trello.com/b/Cjb5ESUA/sb-ms-spring
 | 04 | Load Balancing | tag `phase-04-complete` | DONE (Slices A–D; review PASS WITH NOTES) |
 | 05 | API Gateway | tag `phase-05-complete` | DONE (Slices A–D; local Bucket4j + narrowed CORS) |
 | 06 | Configuration Management | tag `phase-06-complete` | DONE (Slices A–D; refresh verified; ConfigMap/Secret deferred to Phase 18) |
-| 07 | Resilience Engineering | `feature/phase-07-resilience` | NEXT — Slice A |
+| 07 | Resilience Engineering | `feature/phase-07-resilience` | PARTIAL — Slice A DONE; next Slice B retry/backoff classification |
 | 08 | Database Architecture | `feature/phase-08-database` | [ ] |
 | 09 | Distributed Transactions / Saga | `feature/phase-09-saga` | [ ] |
 | 10 | Kafka & Event-Driven Architecture | `feature/phase-10-kafka` | [ ] |
@@ -799,19 +799,13 @@ Running predicates (Slices A–B): `/api/v1/orders/**` → `lb://order-service`,
 One of the most important phases. Create failures on purpose.
 
 ```
-Order → Inventory → X DOWN
-```
-
-```java
-@CircuitBreaker(name = "inventoryService", fallbackMethod = "inventoryFallback")
-public InventoryResponse checkInventory(String sku) {
-    return inventoryClient.getInventory(sku);
-}
+Client → order-service availability view → Resilience4j → inventory GET
+Client → order creation                  → inventory reserve (unchanged until idempotent)
 ```
 
 ### Learn / implement (Resilience4j)
 
-- [ ] Timeout
+- [x] Timeout
 - [ ] Retry
 - [ ] Exponential backoff
 - [ ] Circuit breaker
@@ -820,23 +814,44 @@ public InventoryResponse checkInventory(String sku) {
 - [ ] Rate limiter
 - [ ] Concurrency control
 - [ ] Graceful degradation
-- [ ] Fail-fast
+- [x] Fail-fast
 - [ ] Idempotency
-- [ ] Dead-letter handling
+- [ ] Dead-letter handling — concept boundary only here; concrete Kafka DLT work is Phase 10
 - [ ] **When NOT to retry** (as important as retry itself)
 
 ### Hands-on loop
 
-- [ ] Build the call
-- [ ] Shut down inventory
-- [ ] Observe failure
+- [x] Build the call
+- [x] Shut down inventory and observe fast connection/no-instance failure
+- [x] Inject latency and observe a real timeout
 - [ ] Add timeout → retry → circuit breaker
-- [ ] Measure behavior
+- [x] Measure behavior
 - [ ] Add fallback
-- [ ] Test recovery
+- [x] Test recovery
 - [ ] Integrate into capstone later
 
-**Next:** Make data genuinely distributed.
+### Slice progress
+
+One slice at a time, in order. The caller is `order-service`. The dependency you break is `inventory-service`.
+
+| Slice | Topics | Scope | Status |
+|-------|--------|-------|--------|
+| **A** | Baseline failure, Timeout, Fail-fast | Add a development-only delay to the **read-only** inventory lookup and call it through order-service. Compare the existing Feign connect/read timeouts with a shorter Resilience4j total execution budget. A stopped service proves fast connection failure; a deliberately slow service proves the time limiter. Do not apply this first experiment to stock mutation | DONE — slow inventory took ~3.01s directly while order-service returned typed 503 in ~0.76s; healthy lookup recovered to 200 in ~0.10s; missing inventory stayed 404; stopped inventory returned a stable typed 503 without internal URL leakage; recovery returned 200 after Eureka convergence. OpenAPI documents 503. Focused tests and whitespace cleanup were explicitly deferred by the learner (2026-10-01) |
+| **B** | Retry, Exponential backoff, When NOT to retry | Retry the read-only inventory lookup only for classified transient failures, with bounded exponential backoff. Prove that 400/404/409 and other permanent/domain failures are attempted once. Keep reserve/release mutations outside retry until Slice C supplies a downstream idempotency contract | not started |
+| **C** | Idempotent mutation | Extend the stable operation identity from Phase 02 across the order → inventory reserve boundary, persist/deduplicate it in inventory-service, and prove that replaying a timed-out reserve cannot decrement available stock twice. Only then allow a narrowly classified reserve retry | not started |
+| **D** | Circuit breaker, Recovery, Safe fallback | Count classified inventory failures, open the circuit, fail fast without calling inventory, then observe half-open recovery. Do not fake a successful stock reservation: the write path keeps a typed unavailable response; graceful degradation is demonstrated only on the read-only availability view where `UNKNOWN` is honest | not started |
+| **E** | Bulkhead, Concurrency control, Rate limiter | Bound concurrent outgoing inventory work with a semaphore bulkhead so slow calls cannot occupy every order-service request thread. Separately cap admitted dependency calls per time window and distinguish this internal protection from the Phase 05 Gateway client rate limit | not started |
+| **F** | Dead-letter boundary | N/A (intentional) for implementation in this synchronous HTTP phase. Document what happens after retries are exhausted; implement a real Kafka dead-letter topic, consumer metadata, and replay policy in Phase 10 rather than inventing a local pseudo-DLT | DEFERRED TO PHASE 10 |
+
+Phase 02 already set HTTP connect/read timeouts and `Idempotency-Key` on `POST /api/v1/orders`. These slices add Resilience4j around the inventory call; they do not replace that work.
+
+**Phase 07 design review (2026-09-27):** keep timeout and retry experiments on a read-only lookup until inventory-service can deduplicate mutations. Connection refusal and slowness are separate failure modes and must be tested separately. A fallback must not claim that stock was reserved when the downstream outcome is unknown. Gateway rate limiting protects the public edge; the Slice E limiter protects an internal dependency. Kafka dead-letter handling remains Phase 10.
+
+**Slice A review evidence (2026-10-01):** fresh seven-module `mvn clean test` passed. With `INVENTORY_GET_DELAY=3s`, direct inventory returned 200 in ~3.01s while `/api/v1/availability/2` returned 503 in ~0.76s, proving the 750ms Resilience4j budget. With zero delay, availability returned 200 in ~0.10s and an unknown product remained a typed 404. After the close-out fix, stopping inventory returned `503 application/problem+json` with stable detail `inventory-service unavailable` and no internal URL; the endpoint recovered to 200 after inventory restarted and Eureka converged. OpenAPI now documents 503. Review is **PASS WITH NOTES**: focused tests and the existing whitespace finding were explicitly deferred by the learner.
+
+**Next:** Slice B — retry/backoff classification.
+
+**Next phase:** Make data genuinely distributed.
 
 ---
 

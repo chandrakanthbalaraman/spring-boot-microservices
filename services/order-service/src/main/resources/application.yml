@@ -60,3 +60,10 @@ eureka:
     # Local same-machine: advertise localhost, not the LAN IP.
     hostname: localhost
     prefer-ip-address: false
+
+resilience4j:
+  timelimiter:
+    instances:
+      inventoryAvailability:
+        timeout-duration: 750ms
+        cancel-running-future: true

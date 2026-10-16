@@ -9,6 +9,11 @@
 #   ./scripts/dev-services.sh discovery-server
 #   ./scripts/dev-services.sh inventory-service 8091
 #
+# Starting one service again replaces a previous SB-MS JVM on that port.
+# Cursor "Rerun Task" often leaves the forked spring-boot:run process running
+# after the shell is gone, so the next start would otherwise see the port busy.
+# A listener that is not this service's main class is left alone.
+#
 # Stop SB-MS JVMs and pause the Postgres containers (volumes are kept):
 #   ./scripts/dev-services.sh stop
 
@@ -35,6 +40,9 @@ Usage: ./scripts/dev-services.sh <command>
   inventory-service 8092   load-balancer instance B
   stop                     SIGTERM SB-MS JVMs only, then docker compose stop
 
+Starting one service replaces a previous SB-MS JVM on that same port.
+Other programs listening there are left alone.
+
 Same Cursor tabs: Tasks: Run Task → SB-MS: start all
 Each tab runs this script once, so the log stays in the editor chat context.
 EOF
@@ -44,14 +52,100 @@ set_title() {
   printf '\033]0;SB-MS %s\007' "$1"
 }
 
-assert_port_free() {
+listener_pid() {
+  lsof -nP -t -iTCP:"$1" -sTCP:LISTEN 2>/dev/null | awk 'NR == 1 { print; exit }' || true
+}
+
+process_command() {
+  ps -ww -o command= -p "$1" 2>/dev/null || true
+}
+
+process_pgid() {
+  ps -o pgid= -p "$1" 2>/dev/null | tr -d '[:space:]' || true
+}
+
+port_is_listening() {
+  lsof -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1
+}
+
+# True when another SB-MS JVM in this process group is still listening.
+# Inventory runs twice; stopping one port must leave the other instance up.
+group_has_other_sbms_listener() {
+  local pgid="$1"
+  local pid="$2"
+  local other other_pgid
+  while IFS= read -r other; do
+    [[ -z "${other}" || "${other}" == "${pid}" ]] && continue
+    other_pgid="$(process_pgid "${other}")"
+    [[ "${other_pgid}" == "${pgid}" ]] || continue
+    if process_command "${other}" | grep -qE 'com\.example\.microservices\.[A-Za-z0-9.]+\.[A-Za-z]+Application'; then
+      return 0
+    fi
+  done < <(lsof -nP -t -iTCP -sTCP:LISTEN 2>/dev/null | sort -u)
+  return 1
+}
+
+wait_until_port_free() {
+  local port="$1"
+  local tries="$2"
+  local i
+  for i in $(seq 1 "${tries}"); do
+    if ! port_is_listening "${port}"; then
+      return 0
+    fi
+    sleep 0.5
+  done
+  return 1
+}
+
+signal_listener() {
+  local pid="$1"
+  local pgid="$2"
+  local self_pgid="$3"
+  local sig="$4"
+  if [[ -n "${pgid}" && "${pgid}" != "0" && "${pgid}" != "1" && "${pgid}" != "${self_pgid}" ]] \
+    && ! group_has_other_sbms_listener "${pgid}" "${pid}"; then
+    kill "-${sig}" "-${pgid}" 2>/dev/null || kill "-${sig}" "${pid}" 2>/dev/null || true
+  else
+    kill "-${sig}" "${pid}" 2>/dev/null || true
+  fi
+}
+
+# Cursor rerun kills the task shell and leaves Maven's forked JVM on the port.
+# Stop that previous instance when it is this service. Leave any other listener.
+reclaim_port() {
   local port="$1"
   local label="$2"
-  if lsof -nP -iTCP:"${port}" -sTCP:LISTEN >/dev/null 2>&1; then
+  local main_class="$3"
+  local pid pgid self_pgid
+  pid="$(listener_pid "${port}")"
+  if [[ -z "${pid}" ]]; then
+    return 0
+  fi
+  if ! process_command "${pid}" | grep -qF -- "${main_class}"; then
     echo "SB-MS ${label}: port ${port} is already in use." >&2
     lsof -nP -iTCP:"${port}" -sTCP:LISTEN >&2 || true
     exit 1
   fi
+  pgid="$(process_pgid "${pid}")"
+  self_pgid="$(process_pgid "$$")"
+  echo "SB-MS ${label}: replacing previous instance on port ${port} (pid ${pid})"
+  signal_listener "${pid}" "${pgid}" "${self_pgid}" TERM
+  if wait_until_port_free "${port}" 30; then
+    return 0
+  fi
+  pid="$(listener_pid "${port}")"
+  if [[ -n "${pid}" ]]; then
+    pgid="$(process_pgid "${pid}")"
+    echo "SB-MS ${label}: previous instance did not release port ${port}; sending SIGKILL" >&2
+    signal_listener "${pid}" "${pgid}" "${self_pgid}" KILL
+  fi
+  if wait_until_port_free "${port}" 10; then
+    return 0
+  fi
+  echo "SB-MS ${label}: port ${port} is still in use." >&2
+  lsof -nP -iTCP:"${port}" -sTCP:LISTEN >&2 || true
+  exit 1
 }
 
 wait_healthy() {
@@ -152,7 +246,7 @@ cmd_postgres() {
 cmd_discovery() {
   set_title "discovery-server :8761"
   echo "SB-MS starting discovery-server"
-  assert_port_free 8761 "discovery-server"
+  reclaim_port 8761 "discovery-server" "com.example.microservices.discovery.DiscoveryServerApplication"
   run_module discovery-server
 }
 
@@ -160,21 +254,21 @@ cmd_config() {
   set_title "config-server :8888"
   echo "SB-MS starting config-server"
   echo "SB-MS config repo (relative to the config-server module): ../../infrastructure/config-repo"
-  assert_port_free 8888 "config-server"
+  reclaim_port 8888 "config-server" "com.example.microservices.config.ConfigServerApplication"
   run_module config-server
 }
 
 cmd_gateway() {
   set_title "api-gateway :8080"
   echo "SB-MS starting api-gateway"
-  assert_port_free 8080 "api-gateway"
+  reclaim_port 8080 "api-gateway" "com.example.microservices.gateway.ApiGatewayApplication"
   run_module api-gateway
 }
 
 cmd_order() {
   set_title "order-service :8083"
   echo "SB-MS starting order-service"
-  assert_port_free 8083 "order-service"
+  reclaim_port 8083 "order-service" "com.example.microservices.order.OrderServiceApplication"
   run_module order-service
 }
 
@@ -213,7 +307,7 @@ cmd_product() {
   port="$(product_port)"
   echo "SB-MS starting product-service"
   echo "SB-MS product env: ${ROOT}/.env  profile=${SPRING_PROFILES_ACTIVE:-<unset>}  SERVER_PORT=${SERVER_PORT:-<unset>}  expected port ${port}"
-  assert_port_free "${port}" "product-service"
+  reclaim_port "${port}" "product-service" "com.example.microservices.product.ProductServiceApplication"
   run_module product-service
 }
 
@@ -226,7 +320,7 @@ cmd_inventory() {
   fi
   set_title "inventory-service :${port}"
   echo "SB-MS starting inventory-service on port ${port}"
-  assert_port_free "${port}" "inventory-service"
+  reclaim_port "${port}" "inventory-service" "com.example.microservices.inventory.InventoryServiceApplication"
   run_module inventory-service -Dspring-boot.run.jvmArguments="-Dserver.port=${port}"
 }
 

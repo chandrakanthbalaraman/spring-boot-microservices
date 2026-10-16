@@ -29,7 +29,7 @@ This is **not** Orbit (layered monolith). When a copied `.claude` agent or rule 
 
 ## Current phase
 
-**Phase 07 — Resilience Engineering: next Slice A (intentional failures; Resilience4j timeout, retry, circuit breaker) · Phase 06 DONE (`phase-06-complete`) · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 07](https://trello.com/c/ncjQcKLb) Backlog**
+**Phase 07 — Resilience Engineering: Slice A DONE — read-only availability timeout/fail-fast and stable typed `503` verified; next Slice B retry/backoff classification · Phase 06 DONE (`phase-06-complete`) · Phase 05 DONE (`phase-05-complete`) · Trello [Phase 07](https://trello.com/c/ncjQcKLb) Backlog**
 
 Update this line after every slice (e.g. `Phase 1: product-service REST + Postgres`).
 
